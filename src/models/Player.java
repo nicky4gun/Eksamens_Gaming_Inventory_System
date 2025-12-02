@@ -1,13 +1,25 @@
 package models;
 
 public class Player {
-    private String playerId;
     private String playerName;
     private int credits;
+    private int level;
 
-    public Player(String playerId, String playerName, int credits) {
-        this.playerId = playerId;
+    public Player(String playerName, int credits, int level) {
         this.playerName = playerName;
         this.credits = credits;
+        this.level = level;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public int getCredits() {
+        return credits;
+    }
+
+    public int getLevel() {
+        return level;
     }
 }
