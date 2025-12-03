@@ -3,7 +3,19 @@ package models;
 public class Armor extends Item {
     private int defense;
 
-    public Armor(int id,String name,double weight,int maxStack ,int defense) {
-    super(id,name,weight,maxStack);
-    this.defense = defense;}
+    public Armor(String name, double weight, int maxStack, String category, int defense) {
+    super(name, weight, maxStack,category );
+    this.defense = defense;
+    }
+    public int getDefense() {
+        return defense;
+    }
+
+    @Override
+    public String toString() {
+        return "Armor{" +
+                super.toString() +
+                "defense=" + defense +
+                '}';
+    }
 }
