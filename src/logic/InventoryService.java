@@ -7,7 +7,9 @@ import models.*;
 public class InventoryService {
     private final PlayerRepository playerRepository;
     private final ItemRepository itemRepository;
-
+    private final int MAX_WEIGHT;
+    private final int MAX_ITEM_SLOTS;
+    private int numberOfStartSlots;
     public InventoryService(PlayerRepository playerRepository, ItemRepository itemRepository) {
         this.playerRepository = playerRepository;
         this.itemRepository = itemRepository;
@@ -27,5 +29,9 @@ public class InventoryService {
         Consumeable consumeable = new Consumeable(name, weight, maxStack, category, damage, health);
         itemRepository.addItem(item);
     }
+
+
+
+
 
 }
