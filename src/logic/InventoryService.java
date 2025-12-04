@@ -19,7 +19,7 @@ public class InventoryService {
         playerRepository.addPlayer(player);
     }
 
-    /*
+
     public void createItem(String name, double weight, int maxStack, String category, int damage, double attack_Speed, boolean isOneHanded, int defence, int health) {
         Item item = new Item(name, weight, maxStack, category);
         Weapon weapon = new Weapon(name, weight, maxStack, category, damage, attack_Speed, isOneHanded);
@@ -27,7 +27,5 @@ public class InventoryService {
         Consumeable consumeable = new Consumeable(name, weight, maxStack, category, damage, health);
         itemRepository.addItem(item);
     }
-
-     */
 
 }

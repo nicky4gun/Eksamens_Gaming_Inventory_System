@@ -41,7 +41,7 @@ public class PlayerRepository {
                 String name = rs.getString("name");
                 int credits = rs.getInt("credits");
                 int level = rs.getInt("level");
-                System.out.printf("%-3d | %-10s | %-10s | %-3d | %-3d%n", id, name,  credits, level);
+                System.out.printf("%-3d | %-10s | %-10s | %-3d%n", id, name,  credits, level);
             }
 
         } catch (SQLException e) {
@@ -49,21 +49,32 @@ public class PlayerRepository {
         }
     }
 
-    public void updatePlayer(Player player) {
-        String sql = "UPDATE  SET name = ?, weight = ?, birth_date = ?, species_id = ? WHERE id = ?";
+    public void updatePlayer(String name, int credits, int level) {
+        String sql = "UPDATE info_player SET name = ?, credits = ?, level ? WHERE id = ?";
 
-        try (Connection conn = DriverManager.getConnection(config.url, config.user, config.password)) {
+        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             stmt.setString(1, name);
-            stmt.setDouble(2, weight);
-            stmt.setDate(3, java.sql.Date.valueOf(birthDate));
-            stmt.setInt(4, species_id);
-            stmt.setInt(5, id);
+            stmt.setInt(2, credits);
+            stmt.setInt(3, level);
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while updating animal.", e);
+            throw new RuntimeException("An error occurred while updating player in database.");
+        }
+    }
+
+    public void deletePlayer(int id) {
+        String sql = "DELETE FROM info_player WHERE id = ?";
+
+        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("An error occurred while deleting player.");
         }
     }
 }
