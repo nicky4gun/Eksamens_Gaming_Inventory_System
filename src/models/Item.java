@@ -17,6 +17,8 @@ public abstract class Item {
     public double getWeight() {return weight;}
     public String getCategory() {return category;}
 
+    public abstract String getItemType();
+
     @Override
     public String toString() {
         return "Item{" +

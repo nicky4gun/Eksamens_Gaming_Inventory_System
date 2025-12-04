@@ -4,8 +4,8 @@ public class Consumeable extends Item {
     private int health;
     private int damage;
 
-    public Consumeable(String name, double weight, int maxStack, String category, int health, int damage) {
-        super(name,weight,maxStack,category);
+    public Consumeable(String name, double weight,   String category, int health, int damage) {
+        super(name,weight,category);
         this.health = health;
         this.damage = damage;
 
@@ -15,6 +15,11 @@ public class Consumeable extends Item {
     }
     public int getDamage() {
         return damage;
+    }
+
+    @Override
+    public String getItemType() {
+        return "consumeable";
     }
 
     @Override

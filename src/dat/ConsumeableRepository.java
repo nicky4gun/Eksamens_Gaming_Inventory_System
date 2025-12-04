@@ -16,7 +16,7 @@ public class ConsumeableRepository {
     }
 
     // CRUD operations for items
-    public void addItem(Item item, Weapon weapon, Armor armor, Consumeable consumeable) {
+    public void addItem( Consumeable consumeable) {
         String sql = "INSERT INTO consumeable (name, weight, category, damage, health) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {

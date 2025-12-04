@@ -19,7 +19,7 @@ public class InventoryCliSystem {
         ArmorRepository armorRepository = new ArmorRepository(config);
         ConsumeableRepository consumableRepository = new ConsumeableRepository(config);
 
-        InventoryService service = new InventoryService(playerRepository, itemRepository);
+        InventoryService service = new InventoryService(playerRepository, itemRepository, weaponRepository, armorRepository, consumableRepository);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -68,28 +68,13 @@ public class InventoryCliSystem {
     }
 
     public static void handleCreateItem(InventoryService service, Scanner scanner) {
-        System.out.print("Name: ");
-        String name = scanner.nextLine();
-        scanner.nextLine();
-        System.out.print("Weight: ");
-        double weight = scanner.nextDouble();
-        scanner.nextLine();
 
-        System.out.print("Max stack size: ");
-        int maxStack = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.print("Category: ");
-        String category = scanner.nextLine();
-
-
-        try {
-            service.createItem(name, weight, maxStack, category);
-            System.out.println("Item added successfully!");
-        } catch (RuntimeException e) {
-            e.getMessage();
-        }
     }
-}
+
+
+
+
+    }
+
 
 

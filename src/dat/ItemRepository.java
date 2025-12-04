@@ -23,14 +23,13 @@ public class ItemRepository {
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             stmt.setString(1, item.getName());
-            stmt.setInt(2, item.getMaxStack());
-            stmt.setDouble(3, item.getWeight());
-            stmt.setString(4, item.getCategory());
-            stmt.setInt(5, weapon.getDamage());
-            stmt.setDouble(6, weapon.getAttackSpeed());
-            stmt.setBoolean(7, weapon.getIsOneHanded());
-            stmt.setInt(8, armor.getDefense());
-            stmt.setInt(9, consumeable.getHealth());
+            stmt.setDouble(2, item.getWeight());
+            stmt.setString(3, item.getCategory());
+            stmt.setInt(4, weapon.getDamage());
+            stmt.setDouble(5, weapon.getAttackSpeed());
+            stmt.setBoolean(6, weapon.getIsOneHanded());
+            stmt.setInt(7, armor.getDefense());
+            stmt.setInt(8, consumeable.getHealth());
             stmt.executeUpdate();
 
         } catch (SQLException e) {
