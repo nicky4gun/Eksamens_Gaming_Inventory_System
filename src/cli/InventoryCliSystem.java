@@ -3,9 +3,14 @@ package cli;
 import dat.*;
 import dat.config.DatabaseConfig;
 import logic.InventoryService;
+import models.Armor;
+import models.Consumeable;
+import models.Item;
+import models.Weapon;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLOutput;
 import java.util.Scanner;
 
 public class InventoryCliSystem {
@@ -33,7 +38,8 @@ public class InventoryCliSystem {
         System.out.print("Choose method: ");
         int method = scanner.nextInt();
 
-        while (method != 0) {
+
+        while (true) {
             switch (method) {
                 case 1:
                     handleCreatePlayer(service, scanner);
@@ -42,9 +48,9 @@ public class InventoryCliSystem {
                 case 2:
                     handleCreateItem(service, scanner);
                     break;
+
             }
         }
-
     }
 
     public static void handleCreatePlayer(InventoryService service, Scanner scanner) {
@@ -68,13 +74,77 @@ public class InventoryCliSystem {
     }
 
     public static void handleCreateItem(InventoryService service, Scanner scanner) {
+        while (true) {
+            System.out.println("chose a category: ");
+            System.out.println("1: weapon");
+            System.out.println("2: armor");
+            System.out.println("3: consumable");
+            System.out.println("4: exit");
+            System.out.println("Choose item: ");
 
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            if(choice == 4) {return;}
+            Item item = createItem(choice, scanner);
+            service.addItem(item);
+
+            System.out.println("Item added successfully!");
+        }
     }
 
 
+    private static Item createItem(int choice, Scanner scanner) {
+        System.out.println("Choose name: ");
+        String name = scanner.nextLine();
 
+        System.out.println("Choose weight (Double): ");
+        double weight = scanner.nextDouble();
+        scanner.nextLine();
 
+        switch (choice) {
+            case 1: // eapon
+                String category = "weapon";
+                System.out.println("damage (int): ");
+                int damage = scanner.nextInt();
+                scanner.nextLine();
+
+                System.out.println("attackSpeed (Double): ");
+                double attackSpeed = scanner.nextDouble();
+                scanner.nextLine();
+
+                System.out.println("isOneHanded (TRUE or FALSE): ");
+                boolean isOneHanded = scanner.nextBoolean();
+                scanner.nextLine();
+
+                return new Weapon(name, weight, damage, attackSpeed, isOneHanded, category);
+
+            case 2: //Armor
+                 category = "armor";
+                System.out.println("defense (int): ");
+                int defense = scanner.nextInt();
+                scanner.nextLine();
+
+                return new Armor(name, weight, category, defense);
+
+            case 3:
+                category = "consumable";
+                System.out.println("damage (int); ");
+                damage = scanner.nextInt();
+                scanner.nextLine();
+
+                System.out.println("health: ");
+                int health = scanner.nextInt();
+                scanner.nextLine();
+
+                return new Consumeable(name, weight, category, health, damage);
+
+            default:
+                System.out.println("Invalid choice.");
+                return null;
+        }
     }
+}
 
 
 

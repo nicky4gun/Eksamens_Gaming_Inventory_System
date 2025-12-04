@@ -3,13 +3,13 @@ package models;
 public class Weapon extends Item {
     private int damage;
     private double attackSpeed;
-    private boolean isOneHand;
+    private boolean isOneHanded;
 
-    public Weapon(String name, double weight, int damage, double attackSpeed, boolean isOneHand,String category) {
+    public Weapon(String name, double weight, int damage, double attackSpeed, boolean isOneHanded,String category) {
         super(name, weight, category);
         this.damage = damage;
         this.attackSpeed = attackSpeed;
-        this.isOneHand = isOneHand;
+        this.isOneHanded = isOneHanded;
     }
 
     public int getDamage() {
@@ -20,7 +20,7 @@ public class Weapon extends Item {
         return attackSpeed;
     }
     public boolean getIsOneHanded() {
-        return isOneHand;
+        return isOneHanded;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class Weapon extends Item {
                 super.toString() +
                 "damage=" + damage +
                 ", attackSpeed=" + attackSpeed +
-                ", isOneHand=" + isOneHand +
+                ", isOneHand=" + isOneHanded +
                 '}';
     }
 }

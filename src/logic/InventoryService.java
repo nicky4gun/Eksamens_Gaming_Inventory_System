@@ -50,9 +50,13 @@ public class InventoryService {
         Consumeable consumeable = new Consumeable(name, weight, category, damage, health);
         consumableRepository.addItem(consumeable);
     }
+    public void readinventory(String name, double weight, String category, int damage, double attackSpeed, boolean isOneHanded) {
+        weaponRepository.readItem();
+    }
 
     public void addItem(Item item) {
-        switch (item.getItemType()) {
+        String type = item.getItemType();
+        switch (type) {
             case "weapon":
                 weaponRepository.addItem((Weapon) item);
                 break;
@@ -65,6 +69,13 @@ public class InventoryService {
                 consumableRepository.addItem((Consumeable) item);
                 break;
 
+            default:
+                throw new IllegalArgumentException("Unknown item type: " + type);
         }
+
+
+
+        }
+
     }
-}
+
