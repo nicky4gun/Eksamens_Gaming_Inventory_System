@@ -1,32 +1,29 @@
 package dat;
 
 import dat.config.DatabaseConfig;
-import models.Armor;
-import models.Consumeable;
-import models.Item;
-import models.Weapon;
+import models.Consumable;
 
 import java.sql.*;
 
-public class ConsumeableRepository {
+public class ConsumableRepository {
     private final DatabaseConfig config;
 
-    public ConsumeableRepository(DatabaseConfig config) {
+    public ConsumableRepository(DatabaseConfig config) {
         this.config = config;
     }
 
     // CRUD operations for items
-    public void addItem( Consumeable consumeable) {
+    public void addItem( Consumable consumable) {
         String sql = "INSERT INTO consumeable (name, weight, category, damage, health) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
 
-            stmt.setString(1, consumeable.getName());
-            stmt.setDouble(2, consumeable.getWeight());
-            stmt.setString(3, consumeable.getCategory());
-            stmt.setDouble(4, consumeable.getDamage());
-            stmt.setInt(5, consumeable.getHealth());
+            stmt.setString(1, consumable.getName());
+            stmt.setDouble(2, consumable.getWeight());
+            stmt.setString(3, consumable.getCategory());
+            stmt.setDouble(4, consumable.getDamage());
+            stmt.setInt(5, consumable.getHealth());
             stmt.executeUpdate();
 
         } catch (SQLException e) {

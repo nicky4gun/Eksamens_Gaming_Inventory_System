@@ -1,9 +1,6 @@
 package dat;
 
 import dat.config.DatabaseConfig;
-import models.Armor;
-import models.Consumeable;
-import models.Item;
 import models.Weapon;
 
 import java.sql.*;

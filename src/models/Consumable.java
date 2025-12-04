@@ -1,10 +1,12 @@
 package models;
 
-public class Consumeable extends Item {
+import models.enums.ItemCategory;
+
+public class Consumable extends Item {
     private int health;
     private int damage;
 
-    public Consumeable(String name, double weight,String category, int health, int damage) {
+    public Consumable(String name, double weight, ItemCategory category, int health, int damage) {
         super(name,weight,category);
         this.health = health;
         this.damage = damage;

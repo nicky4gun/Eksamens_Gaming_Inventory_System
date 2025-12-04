@@ -1,9 +1,11 @@
 package models;
 
+import models.enums.ItemCategory;
+
 public class Armor extends Item {
     private int defense;
 
-    public Armor(String name, double weight, String category, int defense) {
+    public Armor(String name, double weight, ItemCategory category, int defense) {
     super(name, weight ,category );
     this.defense = defense;
     }

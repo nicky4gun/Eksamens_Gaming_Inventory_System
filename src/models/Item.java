@@ -1,11 +1,13 @@
 package models;
 
+import models.enums.ItemCategory;
+
 public abstract class Item {
     private String name;
     private double weight;
-    private String category;
+    private ItemCategory category;
 
-    public Item(String name, double weight, String category) {
+    public Item(String name, double weight, ItemCategory category) {
         this.name = name;
         this.weight = weight;
         this.category = category;
@@ -15,7 +17,7 @@ public abstract class Item {
         return name;
     }
     public double getWeight() {return weight;}
-    public String getCategory() {return category;}
+    public String getCategory() {return category.toString();}
 
     public abstract String getItemType();
 

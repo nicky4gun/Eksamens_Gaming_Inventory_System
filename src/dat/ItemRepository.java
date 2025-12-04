@@ -2,7 +2,7 @@ package dat;
 
 import dat.config.DatabaseConfig;
 import models.Armor;
-import models.Consumeable;
+import models.Consumable;
 import models.Item;
 import models.Weapon;
 
@@ -16,7 +16,7 @@ public class ItemRepository {
     }
 
     // CRUD operations for items
-    public void addItem(Item item, Weapon weapon, Armor armor, Consumeable consumeable) {
+    public void addItem(Item item, Weapon weapon, Armor armor, Consumable consumable) {
         String sql = "INSERT INTO item_def (name, max_Stack, weight, category, damage, attack_Speed, is_One_Hand, defense, health) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
@@ -29,7 +29,7 @@ public class ItemRepository {
             stmt.setDouble(5, weapon.getAttackSpeed());
             stmt.setBoolean(6, weapon.getIsOneHanded());
             stmt.setInt(7, armor.getDefense());
-            stmt.setInt(8, consumeable.getHealth());
+            stmt.setInt(8, consumable.getHealth());
             stmt.executeUpdate();
 
         } catch (SQLException e) {

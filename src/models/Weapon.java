@@ -1,11 +1,13 @@
 package models;
 
+import models.enums.ItemCategory;
+
 public class Weapon extends Item {
     private int damage;
     private double attackSpeed;
     private boolean isOneHanded;
 
-    public Weapon(String name, double weight, int damage, double attackSpeed, boolean isOneHanded,String category) {
+    public Weapon(String name, double weight, int damage, double attackSpeed, boolean isOneHanded, ItemCategory category) {
         super(name, weight, category);
         this.damage = damage;
         this.attackSpeed = attackSpeed;
@@ -14,7 +16,6 @@ public class Weapon extends Item {
 
     public int getDamage() {
         return damage;
-
     }
     public double getAttackSpeed() {
         return attackSpeed;
