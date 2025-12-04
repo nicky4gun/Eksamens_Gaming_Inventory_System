@@ -10,7 +10,6 @@ import models.Weapon;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.SQLOutput;
 import java.util.Scanner;
 
 public class InventoryCliSystem {
@@ -48,7 +47,6 @@ public class InventoryCliSystem {
                 case 2:
                     handleCreateItem(service, scanner);
                     break;
-
             }
         }
     }
