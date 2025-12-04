@@ -1,10 +1,8 @@
 package cli;
 
-import dat.ItemRepository;
-import dat.PlayerRepository;
+import dat.*;
 import dat.config.DatabaseConfig;
 import logic.InventoryService;
-import models.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,6 +15,9 @@ public class InventoryCliSystem {
 
         PlayerRepository playerRepository = new PlayerRepository(config);
         ItemRepository itemRepository = new ItemRepository(config);
+        WeaponRepository weaponRepository = new WeaponRepository(config);
+        ArmorRepository armorRepository = new ArmorRepository(config);
+        ConsumeableRepository consumableRepository = new ConsumeableRepository(config);
 
         InventoryService service = new InventoryService(playerRepository, itemRepository);
 

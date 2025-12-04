@@ -2,18 +2,27 @@ package logic;
 
 import dat.ItemRepository;
 import dat.PlayerRepository;
+import dat.WeaponRepository;
 import models.*;
 
 public class InventoryService {
     private final PlayerRepository playerRepository;
     private final ItemRepository itemRepository;
-    private final int MAX_WEIGHT;
-    private final int MAX_ITEM_SLOTS;
-    private int numberOfStartSlots;
-    public InventoryService(PlayerRepository playerRepository, ItemRepository itemRepository) {
+    private final WeaponRepository weaponRepository;
+
+    private final int MAX_WEIGHT = 50;
+    private final int MAX_SLOTS =192;
+    private int unlockedSlots = 32;
+
+    public InventoryService(PlayerRepository playerRepository, ItemRepository itemRepository, WeaponRepository weaponRepository) {
         this.playerRepository = playerRepository;
         this.itemRepository = itemRepository;
+        this.weaponRepository = weaponRepository;
     }
+
+    // Game logic
+
+
 
     // Create objects
     public void createPlayer(String playerName, int credits, int level) {
@@ -21,17 +30,13 @@ public class InventoryService {
         playerRepository.addPlayer(player);
     }
 
-
-    public void createItem(String name, double weight, int maxStack, String category, int damage, double attack_Speed, boolean isOneHanded, int defence, int health) {
-        Item item = new Item(name, weight, maxStack, category);
-        Weapon weapon = new Weapon(name, weight, maxStack, category, damage, attack_Speed, isOneHanded);
-        Armor armor = new Armor(name, weight, maxStack, category, defence);
-        Consumeable consumeable = new Consumeable(name, weight, maxStack, category, damage, health);
-        itemRepository.addItem(item);
+    public void createWeapon(String name, double weight, String category, int damage, double attackSpeed, boolean isOneHanded) {
+        Weapon weapon = new Weapon(name, weight, damage, attackSpeed, isOneHanded, category);
+        weaponRepository.addWeapon(weapon);
     }
 
+    public void createArmor() {}
 
-
-
+    public void createConsumable() {}
 
 }

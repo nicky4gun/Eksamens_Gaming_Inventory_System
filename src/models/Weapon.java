@@ -5,12 +5,13 @@ public class Weapon extends Item {
     private double attackSpeed;
     private boolean isOneHand;
 
-    public Weapon(String name, double weight, int maxStack, int damage, double attackSpeed, boolean isOneHand,String category) {
-        super(name, weight, maxStack, category);
+    public Weapon(String name, double weight, int damage, double attackSpeed, boolean isOneHand,String category) {
+        super(name, weight, category);
         this.damage = damage;
         this.attackSpeed = attackSpeed;
         this.isOneHand = isOneHand;
     }
+
     public int getDamage() {
         return damage;
 

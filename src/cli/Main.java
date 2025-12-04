@@ -12,7 +12,7 @@ public class Main {
 
         List<Item> items = new ArrayList<>();
 
-        Inventory inventory = new Inventory();
+        InventoryCliSystem inventory = new InventoryCliSystem();
 
         boolean running = true;
 
