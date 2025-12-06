@@ -25,6 +25,10 @@ public class InventoryCliSystem {
             System.out.println("Connection failed: " + e.getMessage());
         }
 
+        // Shows player how much space is currently used in their inventory
+        System.out.println("Total weight of inventory: " + service.getTotalWeightFromDb() + " kg");
+        System.out.println("Total amount of slots used: " + service.getUsedSlotsFromDb());
+
         System.out.print("Choose method: ");
         int method = scanner.nextInt();
         scanner.nextLine();
@@ -132,17 +136,17 @@ public class InventoryCliSystem {
                 scanner.nextLine();
 
                 return new Armor(name, weight, category, defense);
-            case 3: // Consumable
+            case 3: // consumable
                 category = ItemCategory.CONSUMABLE;
                 System.out.println("damage (int); ");
-                damage = scanner.nextInt();
+                int cdamage = scanner.nextInt();
                 scanner.nextLine();
 
                 System.out.println("health: ");
                 int health = scanner.nextInt();
                 scanner.nextLine();
 
-                return new Consumable(name, weight, category, health, damage);
+                return new Consumable(name, weight, category, health, cdamage);
             default:
                 System.out.println("Invalid choice.");
                 return null;

@@ -12,17 +12,45 @@ public class ArmorRepository {
         this.config = config;
     }
 
+    public double getTotalWeight() {
+        String sql = "SELECT COALESCE(SUM(weight), 0) FROM armor";
+
+        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next() ? rs.getDouble(1) : 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error: Unable calculate total weight");
+        }
+    }
+
+    public int getItemCount() {
+        String sql = "SELECT COUNT(*) FROM armor";
+
+        try(Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch(SQLException e){
+            throw new RuntimeException("Error: Unable calculate total amount of items");
+        }
+    }
+
     // CRUD operations for weapons
     public void addItem( Armor armor) {
-        String sql = "INSERT INTO armor (name, weight, category, , defense, ) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO armor (name, weight, defense, category) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             stmt.setString(1,armor.getName());
             stmt.setDouble(2, armor.getWeight());
-            stmt.setString(3, armor.getCategory());
-            stmt.setInt(4, armor.getDefense());
+            stmt.setInt(3, armor.getDefense());
+            stmt.setString(4, armor.getCategory());
 
             stmt.executeUpdate();
 

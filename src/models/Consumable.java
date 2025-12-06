@@ -20,13 +20,11 @@ public class Consumable extends Item {
     }
 
     @Override
-    public String getItemType() {
-        return "consumeable";
-    }
+    public String getItemType() {return "consumable";}
 
     @Override
     public String toString() {
-        return "Consumeable{" + super.toString() +
+        return "Consumable{" + super.toString() +
                 "health=" + health +
                 ", damage=" + damage +
                 '}';

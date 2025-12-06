@@ -12,9 +12,37 @@ public class ConsumableRepository {
         this.config = config;
     }
 
+    public double getTotalWeight() {
+        String sql = "SELECT COALESCE(SUM(weight), 0) FROM consumable";
+
+        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next() ? rs.getDouble(1) : 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error: Unable calculate total weight");
+        }
+    }
+
+    public int getItemCount() {
+        String sql = "SELECT COUNT(*) FROM consumable";
+
+        try(Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch(SQLException e){
+            throw new RuntimeException("Error: Unable calculate total amount of items");
+        }
+    }
+
     // CRUD operations for items
     public void addItem( Consumable consumable) {
-        String sql = "INSERT INTO consumeable (name, weight, category, damage, health) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO consumable (name, weight, category, health, damage) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -32,7 +60,7 @@ public class ConsumableRepository {
     }
 
     public void readItem() {
-        String sql = "SELECT id, name, weight, category, damage, health FROM consumeable";
+        String sql = "SELECT id, name, weight, category, damage, health FROM consumable";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -54,7 +82,7 @@ public class ConsumableRepository {
     }
 
     public void updateItem(String name, double weight, String category, int damage, int health) {
-        String sql = "UPDATE consumeable  SET name = ?, weight = ?, category = ?, damage = ?, health = ? WHERE id = ?";
+        String sql = "UPDATE consumable  SET name = ?, weight = ?, category = ?, damage = ?, health = ? WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -73,7 +101,7 @@ public class ConsumableRepository {
     }
 
     public void deleteItem(int id) {
-        String sql = "DELETE FROM consumeable WHERE id = ?";
+        String sql = "DELETE FROM consumable WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);

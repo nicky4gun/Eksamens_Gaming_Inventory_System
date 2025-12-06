@@ -12,6 +12,34 @@ public class WeaponRepository {
         this.config = config;
     }
 
+    public double getTotalWeight() {
+        String sql = "SELECT COALESCE(SUM(weight), 0) FROM weapon";
+
+        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())){
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next() ? rs.getDouble(1) : 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error: Unable calculate total weight");
+        }
+    }
+
+    public int getItemCount() {
+        String sql = "SELECT COUNT(*) FROM weapon";
+
+        try(Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch(SQLException e){
+            throw new RuntimeException("Error: Unable calculate total amount of items");
+        }
+    }
+
     // CRUD operations for items
     public void addItem(Weapon weapon) {
         String sql = "INSERT INTO weapon (name, weight, category, damage, attackSpeed, isOneHanded) VALUES (?, ?, ?, ?, ?, ?)";

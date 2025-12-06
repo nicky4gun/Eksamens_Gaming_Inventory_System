@@ -35,8 +35,8 @@ import java.util.Scanner;
 //        Player player = new Player("Player", 100, 20);
 //        Item bow = new Weapon("warbow",3,1,12,1.24,false,"weapon");
 //        Item twoHandedSword = new Weapon("twinblade",4,1,8,2.00,false,"weapon");
-//        Item healingPotion = new Consumeable("Healindrink", 2.1, 12, "consumeable", 12, 0);
-//        Item bomb = new Consumeable("bomb", 7, 5, "consumeable", 0, 10);
+//        Item healingPotion = new consumable("Healindrink", 2.1, 12, "consumable", 12, 0);
+//        Item bomb = new consumable("bomb", 7, 5, "consumable", 0, 10);
 //        Item helmet = new Armor("vikinghat",3,1,"Armor",32);
 //        Item chestplate = new Armor("hevy chestplate",6,1,"Armor",32);
 //
@@ -104,7 +104,7 @@ import java.util.Scanner;
 //               items.add(new Armor(name1, weight1, maxStack1, category, defence));
 //               break;
 //
-//           case "consumeable":
+//           case "consumable":
 //               System.out.println("Name: ");
 //               String name2 = input.nextLine();
 //
@@ -124,7 +124,7 @@ import java.util.Scanner;
 //               int health = input.nextInt();
 //               input.nextLine();
 //
-//               items.add(new Consumeable(name2, weight2, maxStack2,  category,  damage2 , health));
+//               items.add(new consumable(name2, weight2, maxStack2,  category,  damage2 , health));
 //               break;
 //        }
 //
