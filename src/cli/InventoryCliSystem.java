@@ -128,7 +128,7 @@ public class InventoryCliSystem {
                 boolean isOneHanded = scanner.nextBoolean();
                 scanner.nextLine();
 
-                return new Weapon(name, weight, damage, attackSpeed, isOneHanded, category);
+                return new Weapon(name, weight, damage, attackSpeed, isOneHanded, category, weaponCategory);
             case 2: //Armor
                 category = ItemCategory.ARMOR;
                 System.out.println("defense (int): ");

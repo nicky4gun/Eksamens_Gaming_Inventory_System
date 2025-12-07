@@ -9,7 +9,7 @@ public class Weapon extends Item {
     private boolean isOneHanded;
     private WeaponCategory weaponCategory;
 
-    public Weapon(String name, double weight, int damage, double attackSpeed, boolean isOneHanded, ItemCategory category) {
+    public Weapon(String name, double weight, int damage, double attackSpeed, boolean isOneHanded, ItemCategory category, WeaponCategory weaponCategory) {
         super(name, weight, category);
         this.damage = damage;
         this.attackSpeed = attackSpeed;

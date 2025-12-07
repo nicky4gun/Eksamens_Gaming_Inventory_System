@@ -16,7 +16,5 @@ public enum WeaponCategory {
     TOME,
     ORB,
     CURSED,
-    ELEMENTAL,
-
-
+    ELEMENTAL
 }

@@ -56,12 +56,12 @@ public class WeaponRepository {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while trying to add item to database.");
+            throw new RuntimeException("An error occurred while trying to add item to database.", e);
         }
     }
 
     public void readItem() {
-        String sql = "SELECT id, name, weight, category, damage, attack_Speed, isOneHanded FROM weapon";
+        String sql = "SELECT id, name, weight, damage, attackSpeed, isOneHanded, category FROM weapon";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -71,15 +71,15 @@ public class WeaponRepository {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 double weight = rs.getDouble("weight");
-                String category = rs.getString("category");
                 int damage = rs.getInt("damage");
                 double attackSpeed = rs.getDouble("attackSpeed");
                 boolean isOneHanded = rs.getBoolean("isOneHanded");
-                System.out.printf("%-3d | %-10s | %-3f | %-10s | %-3d | %-3f | %-3b%n", id, name, weight, category, damage, attackSpeed, isOneHanded);
+                String category = rs.getString("category");
+                System.out.printf("%-3d | %-10s | %-3f | %-3d | %-3f | %-3b | %-10s%n", id, name, weight, damage, attackSpeed, isOneHanded, category);
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while reading item.");
+            throw new RuntimeException("An error occurred while reading item.", e);
         }
     }
 
@@ -99,7 +99,7 @@ public class WeaponRepository {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while updating item.");
+            throw new RuntimeException("An error occurred while updating item.", e);
         }
     }
 
@@ -112,7 +112,7 @@ public class WeaponRepository {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while deleting item.");
+            throw new RuntimeException("An error occurred while deleting item.", e);
         }
     }
 }
