@@ -1,0 +1,18 @@
+package models.enums;
+
+public enum ArmorCategory {
+    HEAVYBREASTPLATE,
+    HEAVYLEGGNGS,
+    HEAVYBOOTS,
+    HEAVYHELMENT,
+    LIGHTBREASTPLATE,
+    LIGHTLEGGNGS,
+    LIGHTBOOTS,
+    LIGHTHELMENT,
+    BREASTPLATE,
+    LEGGINGS,
+    BOOTS,
+    HELMET,
+
+
+}

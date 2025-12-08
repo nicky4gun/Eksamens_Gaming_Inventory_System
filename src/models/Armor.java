@@ -9,6 +9,7 @@ public class Armor extends Item {
     super(name, weight, category);
     this.defense = defense;
     }
+
     public int getDefense() {
         return defense;
     }

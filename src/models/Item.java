@@ -17,7 +17,7 @@ public abstract class Item {
         return name;
     }
     public double getWeight() {return weight;}
-    public String getCategory() {return category.toString();}
+    public ItemCategory getCategory() {return category;}
 
     public abstract ItemCategory getItemType();
 

@@ -50,12 +50,12 @@ public class ArmorRepository {
             stmt.setString(1,armor.getName());
             stmt.setDouble(2, armor.getWeight());
             stmt.setInt(3, armor.getDefense());
-            stmt.setString(4, armor.getCategory());
+            stmt.setString(4, armor.getCategory().name());
 
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while trying to add item to database.");
+            throw new RuntimeException("An error occurred while trying to add item to database.", e);
         }
     }
 
@@ -77,7 +77,7 @@ public class ArmorRepository {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while reading item.");
+            throw new RuntimeException("An error occurred while reading item.", e);
         }
     }
 
@@ -96,7 +96,7 @@ public class ArmorRepository {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while updating item.");
+            throw new RuntimeException("An error occurred while updating item.", e);
         }
     }
 
@@ -109,7 +109,7 @@ public class ArmorRepository {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while deleting item.");
+            throw new RuntimeException("An error occurred while deleting item.", e);
         }
     }
 }

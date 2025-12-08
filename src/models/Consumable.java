@@ -10,8 +10,8 @@ public class Consumable extends Item {
         super(name,weight,category);
         this.health = health;
         this.damage = damage;
-
     }
+
     public int getHealth() {
         return health;
     }

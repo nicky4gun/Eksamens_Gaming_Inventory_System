@@ -5,9 +5,11 @@ import dat.config.DatabaseConfig;
 import logic.InventoryService;
 import models.*;
 import models.enums.ItemCategory;
+import models.enums.WeaponCategory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Random;
 import java.util.Scanner;
 
 public class InventoryCliSystem {
@@ -26,8 +28,8 @@ public class InventoryCliSystem {
         }
 
         // Shows player how much space is currently used in their inventory
-        System.out.println("Total weight of inventory: " + service.getTotalWeightFromDb() + " kg");
-        System.out.println("Total amount of slots used: " + service.getUsedSlotsFromDb());
+        System.out.println("Inventory (weight): " + service.getTotalWeightFromDb() + " kg");
+        System.out.println("Slots used: " + service.getUsedSlotsFromDb());
 
         System.out.print("Choose method: ");
         int method = scanner.nextInt();
@@ -39,25 +41,25 @@ public class InventoryCliSystem {
                     handleCreatePlayer(service, scanner);
                     return;
                 case 2:
-                    handleCreateItem(service, scanner);
+                    handlePickUpItem(service, scanner);
                     return;
                 case 0:
-                    System.out.println("Exiting...");
+                    System.out.println("Exiting Inventory...");
                     return;
                 default:
-                    System.out.println("Invalid choice");
+                    System.out.println("Invalid choice. Try again!");
             }
         }
     }
 
     private static InventoryService getService(DatabaseConfig config) {
         PlayerRepository playerRepository = new PlayerRepository(config);
-        ItemRepository itemRepository = new ItemRepository(config);
+        // ItemRepository itemRepository = new ItemRepository(config);
         WeaponRepository weaponRepository = new WeaponRepository(config);
         ArmorRepository armorRepository = new ArmorRepository(config);
         ConsumableRepository consumableRepository = new ConsumableRepository(config);
 
-        return new InventoryService(playerRepository, itemRepository, weaponRepository, armorRepository, consumableRepository);
+        return new InventoryService(playerRepository, weaponRepository, armorRepository, consumableRepository);
     }
 
     public static void handleCreatePlayer(InventoryService service, Scanner scanner) {
@@ -80,75 +82,59 @@ public class InventoryCliSystem {
         }
     }
 
-    public static void handleCreateItem(InventoryService service, Scanner scanner) {
-        while (true) {
-            System.out.println("Choose a category: ");
-            System.out.println("1: weapon");
-            System.out.println("2: armor");
-            System.out.println("3: consumable");
-            System.out.println("0: exit");
+    public static void handlePickUpItem(InventoryService service, Scanner scanner) {
+        System.out.println("Choose number of items to pick up: ");
+        int numberOfItems = scanner.nextInt();
 
-            System.out.println("Choose item: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+        for (int i = 0; i < numberOfItems; i++) {
+            Item randomItem = createRandomItem();
+            System.out.println(randomItem);
 
-            if(choice == 0) {return;}
-
-            Item item = createItem(choice, scanner);
-
-            if (item != null) {
-                service.addItem(item);
-                System.out.println("Item added to inventory!");
+            if (randomItem != null) {
+                service.addItem(randomItem);
             }
         }
+
+        System.out.println("Item added to inventory!");
     }
 
-    private static Item createItem(int choice, Scanner scanner) {
-        System.out.println("Choose name: ");
-        String name = scanner.nextLine();
+    public static Item createRandomItem() {
+        Random rand = new Random();
 
-        System.out.println("Choose weight (Double): ");
-        double weight = scanner.nextDouble();
-        scanner.nextLine();
+        int choice = 1 + rand.nextInt(3);
+
+        String name = "item_" + rand.nextInt(1000);
+        double weight = 0.5 + (10 * rand.nextDouble());
 
         ItemCategory category;
+        WeaponCategory weaponCategory;
 
         switch (choice) {
             case 1: // Weapon
                 category = ItemCategory.WEAPON;
-                System.out.println("damage (int): ");
-                int damage = scanner.nextInt();
-                scanner.nextLine();
 
-                System.out.println("attackSpeed (Double): ");
-                double attackSpeed = scanner.nextDouble();
-                scanner.nextLine();
+                int damage = 5 + rand.nextInt(30);
+                double attackSpeed = 0.5 + rand.nextDouble() * 2;
+                boolean isOneHanded = rand.nextBoolean();
 
-                System.out.println("isOneHanded (TRUE or FALSE): ");
-                boolean isOneHanded = scanner.nextBoolean();
-                scanner.nextLine();
+                weaponCategory = WeaponCategory.values()[rand.nextInt(WeaponCategory.values().length)];
 
                 return new Weapon(name, weight, damage, attackSpeed, isOneHanded, category, weaponCategory);
             case 2: //Armor
                 category = ItemCategory.ARMOR;
-                System.out.println("defense (int): ");
-                int defense = scanner.nextInt();
-                scanner.nextLine();
+
+                int defense = 1 + rand.nextInt(40);
 
                 return new Armor(name, weight, category, defense);
             case 3: // consumable
                 category = ItemCategory.CONSUMABLE;
-                System.out.println("damage (int); ");
-                int cdamage = scanner.nextInt();
-                scanner.nextLine();
 
-                System.out.println("health: ");
-                int health = scanner.nextInt();
-                scanner.nextLine();
+                int cdamage = rand.nextInt(20);
+                int health = 5 + rand.nextInt(50);
 
-                return new Consumable(name, weight, category, health, cdamage);
+                return new Consumable(name, weight, category, cdamage, health);
             default:
-                System.out.println("Invalid choice.");
+                System.out.println("Invalid choice. Try again!");
                 return null;
         }
     }

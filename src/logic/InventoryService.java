@@ -9,7 +9,7 @@ import java.util.List;
 
 public class InventoryService {
     private final PlayerRepository playerRepository;
-    private final ItemRepository itemRepository;
+    // private final ItemRepository itemRepository;
     private final WeaponRepository weaponRepository;
     private final ArmorRepository armorRepository;
     private final ConsumableRepository consumableRepository;
@@ -18,9 +18,8 @@ public class InventoryService {
     private final int MAX_SLOTS =192;
     private int unlockedSlots = 32;
 
-    public InventoryService(PlayerRepository playerRepository, ItemRepository itemRepository, WeaponRepository weaponRepository, ArmorRepository armorRepository, ConsumableRepository consumableRepository) {
+    public InventoryService(PlayerRepository playerRepository, WeaponRepository weaponRepository, ArmorRepository armorRepository, ConsumableRepository consumableRepository) {
         this.playerRepository = playerRepository;
-        this.itemRepository = itemRepository;
         this.weaponRepository = weaponRepository;
         this.armorRepository = armorRepository;
         this.consumableRepository = consumableRepository;
@@ -84,14 +83,6 @@ public class InventoryService {
         } catch (SQLException e) {
             throw new RuntimeException("Error occurred while checking limits");
         }
-
-    }
-
-    // Read Inventory
-    public void viewInventory() {
-        armorRepository.readItem();
-        weaponRepository.readItem();
-        consumableRepository.readItem();
     }
 }
 

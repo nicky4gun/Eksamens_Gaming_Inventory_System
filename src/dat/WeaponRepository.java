@@ -42,17 +42,18 @@ public class WeaponRepository {
 
     // CRUD operations for items
     public void addItem(Weapon weapon) {
-        String sql = "INSERT INTO weapon (name, weight, category, damage, attackSpeed, isOneHanded) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO weapon (name, weight, category, damage, attackSpeed, isOneHanded,weaponCategory) VALUES (?, ?, ?, ?, ?, ?,?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             stmt.setString(1, weapon.getName());
             stmt.setDouble(2, weapon.getWeight());
-            stmt.setString(3, weapon.getCategory());
+            stmt.setString(3, weapon.getCategory().name());
             stmt.setInt(4, weapon.getDamage());
             stmt.setDouble(5, weapon.getAttackSpeed());
             stmt.setBoolean(6, weapon.getIsOneHanded());
+            stmt.setString(7,weapon.getweaponCategory().name());
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -61,7 +62,7 @@ public class WeaponRepository {
     }
 
     public void readItem() {
-        String sql = "SELECT id, name, weight, damage, attackSpeed, isOneHanded, category FROM weapon";
+        String sql = "SELECT id, name, weight, damage, attackSpeed, isOneHanded, category,weaponCategory FROM weapon";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -75,7 +76,8 @@ public class WeaponRepository {
                 double attackSpeed = rs.getDouble("attackSpeed");
                 boolean isOneHanded = rs.getBoolean("isOneHanded");
                 String category = rs.getString("category");
-                System.out.printf("%-3d | %-10s | %-3f | %-3d | %-3f | %-3b | %-10s%n", id, name, weight, damage, attackSpeed, isOneHanded, category);
+                String weaponCategory = rs.getString("weaponCategory");
+                System.out.printf("%-3d | %-10s | %-3f | %-3d | %-3f | %-3b| %-10s | %-10s%n", id, name, weight, damage, attackSpeed, isOneHanded, category,weaponCategory);
             }
 
         } catch (SQLException e) {
@@ -83,8 +85,8 @@ public class WeaponRepository {
         }
     }
 
-    public void updateItem(String name, double weight, String category, int damage, double attackSpeed, boolean isOneHanded) {
-        String sql = "UPDATE weapon SET name = ?, weight = ?, category = ?, damage = ?, attackSpeed = ?, isOneHanded = ? WHERE id = ?";
+    public void updateItem(String name, double weight, String category, int damage, double attackSpeed, boolean isOneHanded,String weaponCategory) {
+        String sql = "UPDATE weapon SET name = ?, weight = ?, category = ?, damage = ?, attackSpeed = ?, isOneHanded = ?,weaponCategory =? WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -95,6 +97,7 @@ public class WeaponRepository {
             stmt.setInt(4, damage);
             stmt.setDouble(5, attackSpeed);
             stmt.setBoolean(6,  isOneHanded);
+            stmt.setString(7, weaponCategory);
 
             stmt.executeUpdate();
 
@@ -114,5 +117,6 @@ public class WeaponRepository {
         } catch (SQLException e) {
             throw new RuntimeException("An error occurred while deleting item.", e);
         }
+
     }
 }

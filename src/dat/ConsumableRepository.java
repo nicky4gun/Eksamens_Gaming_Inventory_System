@@ -22,7 +22,7 @@ public class ConsumableRepository {
             return rs.next() ? rs.getDouble(1) : 0;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error: Unable calculate total weight");
+            throw new RuntimeException("Error: Unable calculate total weight", e);
         }
     }
 
@@ -36,7 +36,7 @@ public class ConsumableRepository {
             return rs.next() ? rs.getInt(1) : 0;
 
         } catch(SQLException e){
-            throw new RuntimeException("Error: Unable calculate total amount of items");
+            throw new RuntimeException("Error: Unable calculate total amount of items", e);
         }
     }
 
@@ -49,13 +49,13 @@ public class ConsumableRepository {
 
             stmt.setString(1, consumable.getName());
             stmt.setDouble(2, consumable.getWeight());
-            stmt.setString(3, consumable.getCategory());
+            stmt.setString(3, consumable.getCategory().name());
             stmt.setDouble(4, consumable.getDamage());
             stmt.setInt(5, consumable.getHealth());
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while trying to add item to database.");
+            throw new RuntimeException("An error occurred while trying to add item to database.", e);
         }
     }
 
@@ -77,7 +77,7 @@ public class ConsumableRepository {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while reading item.");
+            throw new RuntimeException("An error occurred while reading item.", e);
         }
     }
 
@@ -96,7 +96,7 @@ public class ConsumableRepository {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while updating item.");
+            throw new RuntimeException("An error occurred while updating item.", e);
         }
     }
 
@@ -109,7 +109,7 @@ public class ConsumableRepository {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while deleting item.");
+            throw new RuntimeException("An error occurred while deleting item.", e);
         }
     }
 }

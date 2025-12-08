@@ -26,7 +26,7 @@ public class Weapon extends Item {
     public boolean getIsOneHanded() {
         return isOneHanded;
     }
-    public WeaponCategory weaponCategory(){return weaponCategory;}
+    public WeaponCategory getweaponCategory(){return weaponCategory;}
 
 
     @Override
