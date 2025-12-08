@@ -77,7 +77,7 @@ public class WeaponRepository {
                 boolean isOneHanded = rs.getBoolean("isOneHanded");
                 String category = rs.getString("category");
                 String weaponCategory = rs.getString("weaponCategory");
-                System.out.printf("%-3d | %-10s | %-3f | %-3d | %-3f | %-3b| %-10s | %-10s%n", id, name, weight, damage, attackSpeed, isOneHanded, category,weaponCategory);
+                System.out.printf("%-3d | %-30s | %-5.2f | %-3d | %-5.2f | %-6b | %-7s | %-10s%n", id, name, weight, damage, attackSpeed, isOneHanded, category,weaponCategory);
             }
 
         } catch (SQLException e) {
@@ -106,17 +106,16 @@ public class WeaponRepository {
         }
     }
 
-    public void deleteItem(int id) {
-        String sql = "DELETE FROM weapon WHERE id = ?";
+    public void deleteItem(String name) {
+        String sql = "DELETE FROM weapon WHERE name = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, id);
+            stmt.setString(1, name);
             stmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException("An error occurred while deleting item.", e);
         }
-
     }
 }

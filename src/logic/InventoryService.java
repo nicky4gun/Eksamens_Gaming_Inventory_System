@@ -40,6 +40,7 @@ public class InventoryService {
         }
     }
 
+    // Ikke i brug endnu
     public void unlockSlots(int amount) {
         unlockedSlots = Math.min(unlockedSlots + amount, MAX_SLOTS);
     }
@@ -83,6 +84,12 @@ public class InventoryService {
         } catch (SQLException e) {
             throw new RuntimeException("Error occurred while checking limits");
         }
+    }
+
+    public void deleteItemFromInventory(String name) {
+        weaponRepository.deleteItem(name);
+        armorRepository.deleteItem(name);
+        consumableRepository.deleteItem(name);
     }
 }
 

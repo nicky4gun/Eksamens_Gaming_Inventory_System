@@ -73,7 +73,7 @@ public class ConsumableRepository {
                 String category = rs.getString("category");
                 int damage = rs.getInt("damage");
                 int health = rs.getInt("health");
-                System.out.printf("%-3d | %-10s | %-3f | %-10s | %-3d | %-3d%n", id, name, weight, category, damage, health);
+                System.out.printf("%-3d | %-30s | %5.2f | %-12s | %-3d | %-3d%n", id, name, weight, category, damage, health);
             }
 
         } catch (SQLException e) {
@@ -100,12 +100,12 @@ public class ConsumableRepository {
         }
     }
 
-    public void deleteItem(int id) {
-        String sql = "DELETE FROM consumable WHERE id = ?";
+    public void deleteItem(String name) {
+        String sql = "DELETE FROM consumable WHERE name = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, id);
+            stmt.setString(1, name);
             stmt.executeUpdate();
 
         } catch (SQLException e) {

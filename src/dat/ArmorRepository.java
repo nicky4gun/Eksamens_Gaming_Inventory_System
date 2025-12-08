@@ -73,7 +73,7 @@ public class ArmorRepository {
                 String category = rs.getString("category");
                 int defense = rs.getInt("defense");
 
-                System.out.printf("%-3d | %-10s | %-3f | %-10s | %-3d%n", id, name, weight, category, defense);
+                System.out.printf("%-3d | %-30s | %5.2f | %-6s | %-3d%n", id, name, weight, category, defense);
             }
 
         } catch (SQLException e) {
@@ -100,12 +100,12 @@ public class ArmorRepository {
         }
     }
 
-    public void deleteItem(int id) {
-        String sql = "DELETE FROM armor WHERE id = ?";
+    public void deleteItem(String name) {
+        String sql = "DELETE FROM armor WHERE name = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, id);
+            stmt.setString(1, name);
             stmt.executeUpdate();
 
         } catch (SQLException e) {

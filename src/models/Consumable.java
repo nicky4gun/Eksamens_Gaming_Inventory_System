@@ -24,9 +24,6 @@ public class Consumable extends Item {
 
     @Override
     public String toString() {
-        return "Consumable{" + super.toString() +
-                "health=" + health +
-                ", damage=" + damage +
-                '}';
+        return super.toString() + ", Health: " + health + ", Damage: " + damage;
     }
 }

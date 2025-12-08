@@ -23,10 +23,6 @@ public abstract class Item {
 
     @Override
     public String toString() {
-        return "Item{" +
-                "name='" + name + '\'' +
-                ", weight=" + weight +
-                ", category='" + category + '\'' +
-                '}';
+        return category.toString() + ", " + name + ", " + String.format("%.2f kg", weight) + ", ";
     }
 }

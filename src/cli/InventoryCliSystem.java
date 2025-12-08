@@ -12,10 +12,13 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class InventoryCliSystem {
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         DatabaseConfig config = new DatabaseConfig();
         InventoryService service = getService(config);
+
+        WeaponRepository weaponRepository = new WeaponRepository(config);
+        ArmorRepository armorRepository = new ArmorRepository(config);
+        ConsumableRepository consumableRepository = new ConsumableRepository(config);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -27,21 +30,32 @@ public class InventoryCliSystem {
         }
 
         // Shows player how much space is currently used in their inventory
-        System.out.println("Inventory (weight): " + service.getTotalWeightFromDb() + " kg");
+        System.out.printf("Inventory (weight): %.2f kg%n", service.getTotalWeightFromDb());
         System.out.println("Slots used: " + service.getUsedSlotsFromDb());
 
-        System.out.print("Choose method: ");
-        int method = scanner.nextInt();
-        scanner.nextLine();
+        printMenu();
 
         while (true) {
+            System.out.print("Choose action: ");
+            int method = scanner.nextInt();
+            scanner.nextLine();
+
             switch (method) {
                 case 1:
                     handleCreatePlayer(service, scanner);
-                    return;
+                    break;
                 case 2:
                     handlePickUpItem(service, scanner);
-                    return;
+                    break;
+                case 3:
+                    System.out.println("Your inventory: ");
+                    showInventory(config, weaponRepository, armorRepository, consumableRepository);
+                    handleDeleteItem(service, scanner);
+                    break;
+                case 4:
+                    System.out.println("Your inventory: ");
+                    showInventory(config, weaponRepository, armorRepository, consumableRepository);
+                    break;
                 case 0:
                     System.out.println("Exiting Inventory...");
                     return;
@@ -81,6 +95,14 @@ public class InventoryCliSystem {
         }
     }
 
+    public static void handleDeleteItem(InventoryService service, Scanner scanner) {
+        System.out.println("Enter name of item: ");
+        String name = scanner.nextLine();
+
+        service.deleteItemFromInventory(name);
+        System.out.println("Item deleted successfully!");
+    }
+
     public static void handlePickUpItem(InventoryService service, Scanner scanner) {
         System.out.println("Choose number of items to pick up: ");
         int numberOfItems = scanner.nextInt();
@@ -102,7 +124,6 @@ public class InventoryCliSystem {
 
         int choice = 1 + rand.nextInt(3);
 
-        // String name = "item_" + rand.nextInt(1000);
         double weight = 0.5 + (10 * rand.nextDouble());
 
         ItemCategory category;
@@ -112,7 +133,6 @@ public class InventoryCliSystem {
         ArmorCategory armorCategory;
         CoolArmorNames coolArmorNames;
         CoolConsumabelName coolConsumabelName;
-
 
         switch (choice) {
             case 1: // Weapon
@@ -164,6 +184,27 @@ public class InventoryCliSystem {
                 System.out.println("Invalid choice. Try again!");
                 return null;
         }
+
+    }
+    public static void showInventory(DatabaseConfig config, WeaponRepository weaponRepo,ArmorRepository armorRepo,ConsumableRepository consumableRepo) {
+      try {
+          System.out.println("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-");
+          weaponRepo.readItem();
+          System.out.println("---------------------------------------------------- ");
+          armorRepo.readItem();
+          System.out.println("---------------------------------------------------- ");
+          consumableRepo.readItem();
+      }catch (RuntimeException e) {
+          throw new RuntimeException("Error while reading inventory: " + e.getMessage());
+      }
+    }
+    private static void printMenu(){
+        System.out.println("\n==== Inventory Actions ====");
+        System.out.println("1: createPlayer");
+        System.out.println("2: pickupItem");
+        System.out.println("3: removeItem");
+        System.out.println("4: showIventory");
+        System.out.println("0: exit");
     }
 }
 

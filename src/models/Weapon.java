@@ -36,12 +36,9 @@ public class Weapon extends Item {
 
     @Override
     public String toString() {
-        return "Weapon{" +
-                super.toString() +
-                "damage=" + damage +
-                ", attackSpeed=" + attackSpeed +
-                ", isOneHand=" + isOneHanded +
-                ", weaponCategory= " + weaponCategory +
-                '}';
+        return super.toString() +
+                "Damage: " + damage +
+                ", Attack Speed: " + String.format("%.2f", attackSpeed) +
+                ", isOneHanded: " + isOneHanded;
     }
 }

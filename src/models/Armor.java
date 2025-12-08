@@ -21,9 +21,6 @@ public class Armor extends Item {
 
     @Override
     public String toString() {
-        return "Armor{" +
-                super.toString() +
-                "defense=" + defense +
-                '}';
+        return super.toString() + "Defense: " + defense;
     }
 }
