@@ -14,5 +14,6 @@ public enum CoolWeaponNames {
     THE_NEGOTIATOR,
     FLESHWEAVER,
     GRIMFANG,
-
+    CURSED,
+    ELEMENTAL
 }

@@ -15,6 +15,5 @@ public enum WeaponCategory {
     WAND,
     TOME,
     ORB,
-    CURSED,
-    ELEMENTAL
+
 }

@@ -4,8 +4,7 @@ import dat.*;
 import dat.config.DatabaseConfig;
 import logic.InventoryService;
 import models.*;
-import models.enums.ItemCategory;
-import models.enums.WeaponCategory;
+import models.enums.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -108,6 +107,12 @@ public class InventoryCliSystem {
 
         ItemCategory category;
         WeaponCategory weaponCategory;
+        CoolWeaponNames coolWeaponNames;
+        CoolWeaponNames coolWeaponNames2;
+        ArmorCategory armorCategory;
+        CoolArmorNames coolArmorNames;
+        CoolConsumabelName coolConsumabelName;
+
 
         switch (choice) {
             case 1: // Weapon
@@ -118,16 +123,38 @@ public class InventoryCliSystem {
                 boolean isOneHanded = rand.nextBoolean();
 
                 weaponCategory = WeaponCategory.values()[rand.nextInt(WeaponCategory.values().length)];
+                coolWeaponNames = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
+                coolWeaponNames2 = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
 
-                return new Weapon(name, weight, damage, attackSpeed, isOneHanded, category, weaponCategory);
+                int nameGen = rand.nextInt(3) + 1;
+                String weaponName;
+
+                if (nameGen == 1) {
+                    weaponName = weaponCategory + " " + coolWeaponNames;
+                }
+                 else if (nameGen == 2){
+                    weaponName = coolWeaponNames + " " + weaponCategory;
+                 }
+                else {
+                    weaponName = coolWeaponNames + " " + weaponCategory + " " + coolWeaponNames2;
+                }
+
+                return new Weapon(weaponName, weight, damage, attackSpeed, isOneHanded, category, weaponCategory);
             case 2: //Armor
                 category = ItemCategory.ARMOR;
 
+                armorCategory = ArmorCategory.values()[rand.nextInt(ArmorCategory.values().length)];
+                coolArmorNames = CoolArmorNames.values()[rand.nextInt(CoolArmorNames.values().length)];
+                String armorName = armorCategory.name() + " " + coolArmorNames;
+
                 int defense = 1 + rand.nextInt(40);
 
-                return new Armor(name, weight, category, defense);
+                return new Armor(armorName, weight, category, defense);
             case 3: // consumable
                 category = ItemCategory.CONSUMABLE;
+
+                coolConsumabelName = CoolConsumabelName.values()[rand.nextInt(CoolConsumabelName.values().length)];
+                String consumableName = coolConsumabelName.name();
 
                 int cdamage = rand.nextInt(20);
                 int health = 5 + rand.nextInt(50);
