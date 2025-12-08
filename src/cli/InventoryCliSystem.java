@@ -48,13 +48,11 @@ public class InventoryCliSystem {
                     handlePickUpItem(service, scanner);
                     break;
                 case 3:
-                    System.out.println("Your inventory: ");
-                    showInventory(config, weaponRepository, armorRepository, consumableRepository);
+                    showInventory(weaponRepository, armorRepository, consumableRepository);
                     handleDeleteItem(service, scanner);
                     break;
                 case 4:
-                    System.out.println("Your inventory: ");
-                    showInventory(config, weaponRepository, armorRepository, consumableRepository);
+                    showInventory(weaponRepository, armorRepository, consumableRepository);
                     break;
                 case 0:
                     System.out.println("Exiting Inventory...");
@@ -186,8 +184,9 @@ public class InventoryCliSystem {
         }
 
     }
-    public static void showInventory(DatabaseConfig config, WeaponRepository weaponRepo,ArmorRepository armorRepo,ConsumableRepository consumableRepo) {
+    public static void showInventory(WeaponRepository weaponRepo,ArmorRepository armorRepo,ConsumableRepository consumableRepo) {
       try {
+          System.out.println("Your inventory: ");
           System.out.println("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-");
           weaponRepo.readItem();
           System.out.println("---------------------------------------------------- ");
