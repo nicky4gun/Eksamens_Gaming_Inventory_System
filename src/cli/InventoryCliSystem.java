@@ -102,7 +102,7 @@ public class InventoryCliSystem {
 
         int choice = 1 + rand.nextInt(3);
 
-        String name = "item_" + rand.nextInt(1000);
+        // String name = "item_" + rand.nextInt(1000);
         double weight = 0.5 + (10 * rand.nextDouble());
 
         ItemCategory category;
@@ -159,7 +159,7 @@ public class InventoryCliSystem {
                 int cdamage = rand.nextInt(20);
                 int health = 5 + rand.nextInt(50);
 
-                return new Consumable(name, weight, category, cdamage, health);
+                return new Consumable(consumableName, weight, category, cdamage, health);
             default:
                 System.out.println("Invalid choice. Try again!");
                 return null;
