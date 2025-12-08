@@ -30,8 +30,8 @@ public class Weapon extends Item {
 
 
     @Override
-    public String getItemType() {
-        return "weapon";
+    public ItemCategory getItemType() {
+        return ItemCategory.WEAPON;
     }
 
     @Override

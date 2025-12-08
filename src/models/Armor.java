@@ -6,7 +6,7 @@ public class Armor extends Item {
     private int defense;
 
     public Armor(String name, double weight, ItemCategory category, int defense) {
-    super(name, weight ,category );
+    super(name, weight, category);
     this.defense = defense;
     }
     public int getDefense() {
@@ -14,8 +14,8 @@ public class Armor extends Item {
     }
 
     @Override
-    public String getItemType() {
-        return "armor";
+    public ItemCategory getItemType() {
+        return ItemCategory.ARMOR;
     }
 
     @Override

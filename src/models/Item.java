@@ -19,7 +19,7 @@ public abstract class Item {
     public double getWeight() {return weight;}
     public String getCategory() {return category.toString();}
 
-    public abstract String getItemType();
+    public abstract ItemCategory getItemType();
 
     @Override
     public String toString() {

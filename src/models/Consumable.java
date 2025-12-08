@@ -20,7 +20,7 @@ public class Consumable extends Item {
     }
 
     @Override
-    public String getItemType() {return "consumable";}
+    public ItemCategory getItemType() {return ItemCategory.CONSUMABLE;}
 
     @Override
     public String toString() {

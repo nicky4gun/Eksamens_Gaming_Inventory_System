@@ -4,6 +4,8 @@ import dat.*;
 import models.*;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InventoryService {
     private final PlayerRepository playerRepository;
@@ -67,13 +69,13 @@ public class InventoryService {
             checkSlotsAvailable();
 
             switch (item.getItemType()) {
-                case "weapon":
+                case WEAPON:
                     weaponRepository.addItem((Weapon) item);
                     break;
-                case "armor":
+                case ARMOR:
                     armorRepository.addItem((Armor) item);
                     break;
-                case "consumable":
+                case CONSUMABLE:
                     consumableRepository.addItem((Consumable) item);
                     break;
                 default:
@@ -83,6 +85,13 @@ public class InventoryService {
             throw new RuntimeException("Error occurred while checking limits");
         }
 
+    }
+
+    // Read Inventory
+    public void viewInventory() {
+        armorRepository.readItem();
+        weaponRepository.readItem();
+        consumableRepository.readItem();
     }
 }
 
