@@ -2,10 +2,12 @@ package logic;
 
 import dat.*;
 import models.*;
+import models.enums.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class InventoryService {
     private final PlayerRepository playerRepository;
@@ -90,6 +92,83 @@ public class InventoryService {
         weaponRepository.deleteItem(name);
         armorRepository.deleteItem(name);
         consumableRepository.deleteItem(name);
+    }
+
+    public List<Item> findAllItems() {
+        List<Item> items = new ArrayList<>();
+
+        items.addAll(weaponRepository.readAllItems());
+        items.addAll(armorRepository.readAllItems());
+        items.addAll(consumableRepository.readAllItems());
+
+        return items;
+    }
+
+    public Item createRandomItem() {
+        Random rand = new Random();
+
+        int choice = 1 + rand.nextInt(3);
+
+        double weight = 0.5 + (10 * rand.nextDouble());
+
+        ItemCategory category;
+        WeaponCategory weaponCategory;
+        CoolWeaponNames coolWeaponNames;
+        CoolWeaponNames coolWeaponNames2;
+        ArmorCategory armorCategory;
+        CoolArmorNames coolArmorNames;
+        CoolConsumabelName coolConsumabelName;
+
+        switch (choice) {
+            case 1: // Weapon
+                category = ItemCategory.WEAPON;
+
+                int damage = 5 + rand.nextInt(30);
+                double attackSpeed = 0.5 + rand.nextDouble() * 2;
+                boolean isOneHanded = rand.nextBoolean();
+
+                weaponCategory = WeaponCategory.values()[rand.nextInt(WeaponCategory.values().length)];
+                coolWeaponNames = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
+                coolWeaponNames2 = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
+
+                int nameGen = rand.nextInt(3) + 1;
+                String weaponName;
+
+                if (nameGen == 1) {
+                    weaponName = weaponCategory + " " + coolWeaponNames;
+                }
+                else if (nameGen == 2){
+                    weaponName = coolWeaponNames + " " + weaponCategory;
+                }
+                else {
+                    weaponName = coolWeaponNames + " " + weaponCategory + " " + coolWeaponNames2;
+                }
+
+                return new Weapon(weaponName, weight, damage, attackSpeed, isOneHanded, category, weaponCategory);
+            case 2: //Armor
+                category = ItemCategory.ARMOR;
+
+                armorCategory = ArmorCategory.values()[rand.nextInt(ArmorCategory.values().length)];
+                coolArmorNames = CoolArmorNames.values()[rand.nextInt(CoolArmorNames.values().length)];
+                String armorName = armorCategory.name() + " " + coolArmorNames;
+
+                int defense = 1 + rand.nextInt(40);
+
+                return new Armor(armorName, weight, category, defense);
+            case 3: // consumable
+                category = ItemCategory.CONSUMABLE;
+
+                coolConsumabelName = CoolConsumabelName.values()[rand.nextInt(CoolConsumabelName.values().length)];
+                String consumableName = coolConsumabelName.name();
+
+                int cdamage = rand.nextInt(20);
+                int health = 5 + rand.nextInt(50);
+
+                return new Consumable(consumableName, weight, category, cdamage, health);
+            default:
+                System.out.println("Invalid choice. Try again!");
+                return null;
+        }
     }
 }
 

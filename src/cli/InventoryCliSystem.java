@@ -8,17 +8,19 @@ import models.enums.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Random;
+import java.util.List;
 import java.util.Scanner;
 
 public class InventoryCliSystem {
     public static void main(String[] args) throws SQLException {
         DatabaseConfig config = new DatabaseConfig();
-        InventoryService service = getService(config);
 
+        PlayerRepository playerRepository = new PlayerRepository(config);
         WeaponRepository weaponRepository = new WeaponRepository(config);
         ArmorRepository armorRepository = new ArmorRepository(config);
         ConsumableRepository consumableRepository = new ConsumableRepository(config);
+
+        InventoryService service = new InventoryService(playerRepository, weaponRepository, armorRepository, consumableRepository);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -33,6 +35,10 @@ public class InventoryCliSystem {
         System.out.printf("Inventory (weight): %.2f kg%n", service.getTotalWeightFromDb());
         System.out.println("Slots used: " + service.getUsedSlotsFromDb());
 
+        run(service, scanner);
+    }
+
+    public static void run(InventoryService service, Scanner scanner) {
         printMenu();
 
         while (true) {
@@ -48,11 +54,11 @@ public class InventoryCliSystem {
                     handlePickUpItem(service, scanner);
                     break;
                 case 3:
-                    showInventory(weaponRepository, armorRepository, consumableRepository);
+                    printInventory(service);
                     handleDeleteItem(service, scanner);
                     break;
                 case 4:
-                    showInventory(weaponRepository, armorRepository, consumableRepository);
+                    printInventory(service);
                     break;
                 case 0:
                     System.out.println("Exiting Inventory...");
@@ -63,17 +69,7 @@ public class InventoryCliSystem {
         }
     }
 
-    private static InventoryService getService(DatabaseConfig config) {
-        PlayerRepository playerRepository = new PlayerRepository(config);
-        // ItemRepository itemRepository = new ItemRepository(config);
-        WeaponRepository weaponRepository = new WeaponRepository(config);
-        ArmorRepository armorRepository = new ArmorRepository(config);
-        ConsumableRepository consumableRepository = new ConsumableRepository(config);
-
-        return new InventoryService(playerRepository, weaponRepository, armorRepository, consumableRepository);
-    }
-
-    public static void handleCreatePlayer(InventoryService service, Scanner scanner) {
+    private static void handleCreatePlayer(InventoryService service, Scanner scanner) {
         System.out.println("Name: ");
         String playerName = scanner.nextLine();
 
@@ -93,7 +89,7 @@ public class InventoryCliSystem {
         }
     }
 
-    public static void handleDeleteItem(InventoryService service, Scanner scanner) {
+    private static void handleDeleteItem(InventoryService service, Scanner scanner) {
         System.out.println("Enter name of item: ");
         String name = scanner.nextLine();
 
@@ -101,12 +97,13 @@ public class InventoryCliSystem {
         System.out.println("Item deleted successfully!");
     }
 
-    public static void handlePickUpItem(InventoryService service, Scanner scanner) {
+    private static void handlePickUpItem(InventoryService service, Scanner scanner) {
         System.out.println("Choose number of items to pick up: ");
         int numberOfItems = scanner.nextInt();
+        scanner.nextLine();
 
         for (int i = 0; i < numberOfItems; i++) {
-            Item randomItem = createRandomItem();
+            Item randomItem = service.createRandomItem();
             System.out.println(randomItem);
 
             if (randomItem != null) {
@@ -114,89 +111,31 @@ public class InventoryCliSystem {
             }
         }
 
-        System.out.println("Item added to inventory!");
+        System.out.println(numberOfItems + " item(s) added to inventory!");
     }
 
-    public static Item createRandomItem() {
-        Random rand = new Random();
+//    public static void showInventory(WeaponRepository weaponRepo,ArmorRepository armorRepo,ConsumableRepository consumableRepo) {
+//      try {
+//          System.out.println("Your inventory: ");
+//          System.out.println("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-");
+//          weaponRepo.readallItems();
+//          System.out.println("---------------------------------------------------- ");
+//          armorRepo.readItem();
+//          System.out.println("---------------------------------------------------- ");
+//          consumableRepo.readItem();
+//      }catch (RuntimeException e) {
+//          throw new RuntimeException("Error while reading inventory: " + e.getMessage());
+//      }
+//    }
 
-        int choice = 1 + rand.nextInt(3);
+    private static void printInventory(InventoryService service) {
+        List<Item> inventory = service.findAllItems();
 
-        double weight = 0.5 + (10 * rand.nextDouble());
-
-        ItemCategory category;
-        WeaponCategory weaponCategory;
-        CoolWeaponNames coolWeaponNames;
-        CoolWeaponNames coolWeaponNames2;
-        ArmorCategory armorCategory;
-        CoolArmorNames coolArmorNames;
-        CoolConsumabelName coolConsumabelName;
-
-        switch (choice) {
-            case 1: // Weapon
-                category = ItemCategory.WEAPON;
-
-                int damage = 5 + rand.nextInt(30);
-                double attackSpeed = 0.5 + rand.nextDouble() * 2;
-                boolean isOneHanded = rand.nextBoolean();
-
-                weaponCategory = WeaponCategory.values()[rand.nextInt(WeaponCategory.values().length)];
-                coolWeaponNames = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
-                coolWeaponNames2 = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
-
-                int nameGen = rand.nextInt(3) + 1;
-                String weaponName;
-
-                if (nameGen == 1) {
-                    weaponName = weaponCategory + " " + coolWeaponNames;
-                }
-                 else if (nameGen == 2){
-                    weaponName = coolWeaponNames + " " + weaponCategory;
-                 }
-                else {
-                    weaponName = coolWeaponNames + " " + weaponCategory + " " + coolWeaponNames2;
-                }
-
-                return new Weapon(weaponName, weight, damage, attackSpeed, isOneHanded, category, weaponCategory);
-            case 2: //Armor
-                category = ItemCategory.ARMOR;
-
-                armorCategory = ArmorCategory.values()[rand.nextInt(ArmorCategory.values().length)];
-                coolArmorNames = CoolArmorNames.values()[rand.nextInt(CoolArmorNames.values().length)];
-                String armorName = armorCategory.name() + " " + coolArmorNames;
-
-                int defense = 1 + rand.nextInt(40);
-
-                return new Armor(armorName, weight, category, defense);
-            case 3: // consumable
-                category = ItemCategory.CONSUMABLE;
-
-                coolConsumabelName = CoolConsumabelName.values()[rand.nextInt(CoolConsumabelName.values().length)];
-                String consumableName = coolConsumabelName.name();
-
-                int cdamage = rand.nextInt(20);
-                int health = 5 + rand.nextInt(50);
-
-                return new Consumable(consumableName, weight, category, cdamage, health);
-            default:
-                System.out.println("Invalid choice. Try again!");
-                return null;
+        for (Item item : inventory) {
+            System.out.println(item);
         }
+    }
 
-    }
-    public static void showInventory(WeaponRepository weaponRepo,ArmorRepository armorRepo,ConsumableRepository consumableRepo) {
-      try {
-          System.out.println("Your inventory: ");
-          System.out.println("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-");
-          weaponRepo.readItem();
-          System.out.println("---------------------------------------------------- ");
-          armorRepo.readItem();
-          System.out.println("---------------------------------------------------- ");
-          consumableRepo.readItem();
-      }catch (RuntimeException e) {
-          throw new RuntimeException("Error while reading inventory: " + e.getMessage());
-      }
-    }
     private static void printMenu(){
         System.out.println("\n==== Inventory Actions ====");
         System.out.println("1: createPlayer");

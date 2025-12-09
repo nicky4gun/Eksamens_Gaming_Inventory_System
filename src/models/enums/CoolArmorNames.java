@@ -12,5 +12,5 @@ public enum CoolArmorNames {
     ETERNITY,
     FATE,
     ELDRITCH,
-    OBLIVATOR,
+    OBLIVATOR
 }

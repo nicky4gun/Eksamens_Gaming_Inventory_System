@@ -2,8 +2,11 @@ package dat;
 
 import dat.config.DatabaseConfig;
 import models.Consumable;
+import models.enums.ItemCategory;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConsumableRepository {
     private final DatabaseConfig config;
@@ -59,7 +62,8 @@ public class ConsumableRepository {
         }
     }
 
-    public void readItem() {
+    public List<Consumable> readAllItems() {
+        List<Consumable> consumables = new ArrayList<>();
         String sql = "SELECT id, name, weight, category, damage, health FROM consumable";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
@@ -73,12 +77,24 @@ public class ConsumableRepository {
                 String category = rs.getString("category");
                 int damage = rs.getInt("damage");
                 int health = rs.getInt("health");
-                System.out.printf("%-3d | %-30s | %5.2f | %-12s | %-3d | %-3d%n", id, name, weight, category, damage, health);
+                // System.out.printf("%-3d | %-30s | %5.2f | %-12s | %-3d | %-3d%n", id, name, weight, category, damage, health);
+
+                Consumable consumable = new Consumable(
+                        rs.getString("name"),
+                        rs.getDouble("weight"),
+                        ItemCategory.valueOf(rs.getString("category")),
+                        rs.getInt("damage"),
+                        rs.getInt("health")
+                );
+
+                consumables.add(consumable);
             }
 
         } catch (SQLException e) {
             throw new RuntimeException("An error occurred while reading item.", e);
         }
+
+        return consumables;
     }
 
     public void updateItem(String name, double weight, String category, int damage, int health) {

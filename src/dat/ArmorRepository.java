@@ -2,8 +2,11 @@ package dat;
 
 import dat.config.DatabaseConfig;
 import models.Armor;
+import models.enums.ItemCategory;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArmorRepository {
     private final DatabaseConfig config;
@@ -59,7 +62,8 @@ public class ArmorRepository {
         }
     }
 
-    public void readItem() {
+    public List<Armor> readAllItems() {
+        List<Armor> armors = new ArrayList<>();
         String sql = "SELECT id, name, weight, category, defense  FROM armor";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
@@ -72,13 +76,23 @@ public class ArmorRepository {
                 double weight = rs.getDouble("weight");
                 String category = rs.getString("category");
                 int defense = rs.getInt("defense");
+                // System.out.printf("%-3d | %-30s | %5.2f | %-6s | %-3d%n", id, name, weight, category, defense);
 
-                System.out.printf("%-3d | %-30s | %5.2f | %-6s | %-3d%n", id, name, weight, category, defense);
+                Armor armor = new Armor(
+                        rs.getString("name"),
+                        rs.getDouble("weight"),
+                        ItemCategory.valueOf(rs.getString("category")),
+                        rs.getInt("defense")
+                );
+
+                armors.add(armor);
             }
 
         } catch (SQLException e) {
             throw new RuntimeException("An error occurred while reading item.", e);
         }
+
+        return armors;
     }
 
     public void updateItem(String name,  double weight, String category,  int defense) {

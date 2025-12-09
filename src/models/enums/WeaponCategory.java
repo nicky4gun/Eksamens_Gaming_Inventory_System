@@ -14,6 +14,5 @@ public enum WeaponCategory {
     STAFF,
     WAND,
     TOME,
-    ORB,
-
+    ORB
 }

@@ -20,6 +20,5 @@ public enum CoolConsumabelName {
     TEMPESTCHARGE,
     FROSTBITEGRENADE,
     THUNDERCLAPVIAL,
-    ASHENFURYMIX,
-
+    ASHENFURYMIX
 }

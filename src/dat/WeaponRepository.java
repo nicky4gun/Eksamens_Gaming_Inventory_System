@@ -2,8 +2,12 @@ package dat;
 
 import dat.config.DatabaseConfig;
 import models.Weapon;
+import models.enums.ItemCategory;
+import models.enums.WeaponCategory;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WeaponRepository {
     private final DatabaseConfig config;
@@ -61,8 +65,9 @@ public class WeaponRepository {
         }
     }
 
-    public void readItem() {
-        String sql = "SELECT id, name, weight, damage, attackSpeed, isOneHanded, category,weaponCategory FROM weapon";
+    public List<Weapon> readAllItems() {
+        List<Weapon> weapons = new ArrayList<>();
+        String sql = "SELECT id, name, weight, damage, attackSpeed, isOneHanded, category, weaponCategory FROM weapon";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -77,12 +82,26 @@ public class WeaponRepository {
                 boolean isOneHanded = rs.getBoolean("isOneHanded");
                 String category = rs.getString("category");
                 String weaponCategory = rs.getString("weaponCategory");
-                System.out.printf("%-3d | %-30s | %-5.2f | %-3d | %-5.2f | %-6b | %-7s | %-10s%n", id, name, weight, damage, attackSpeed, isOneHanded, category,weaponCategory);
+                // System.out.printf("%-3d | %-30s | %-5.2f | %-3d | %-5.2f | %-6b | %-7s | %-10s%n", id, name, weight, damage, attackSpeed, isOneHanded, category,weaponCategory);
+
+                Weapon weapon = new Weapon(
+                        rs.getString("name"),
+                        rs.getDouble("weight"),
+                        rs.getInt("damage"),
+                        rs.getDouble("attackSpeed"),
+                        rs.getBoolean("isOneHanded"),
+                        ItemCategory.valueOf(rs.getString("category")),
+                        WeaponCategory.valueOf(rs.getString("weaponCategory"))
+                );
+
+                weapons.add(weapon);
             }
 
         } catch (SQLException e) {
             throw new RuntimeException("An error occurred while reading item.", e);
         }
+
+        return weapons;
     }
 
     public void updateItem(String name, double weight, String category, int damage, double attackSpeed, boolean isOneHanded,String weaponCategory) {

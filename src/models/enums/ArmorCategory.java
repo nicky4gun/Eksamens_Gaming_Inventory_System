@@ -12,7 +12,5 @@ public enum ArmorCategory {
     BREASTPLATE,
     LEGGINGS,
     BOOTS,
-    HELMET,
-
-
+    HELMET
 }
