@@ -69,6 +69,24 @@ public class InventoryCliSystem {
         }
     }
 
+    private static void printMenu(){
+        System.out.println("\n==== Inventory Actions ====");
+        System.out.println("1: createPlayer");
+        System.out.println("2: pickupItem");
+        System.out.println("3: removeItem");
+        System.out.println("4: showIventory");
+        System.out.println("0: exit");
+    }
+
+    private static void printInventory(InventoryService service) {
+        List<Item> inventory = service.findAllItems();
+
+        for (Item item : inventory) {
+            System.out.println(item);
+        }
+    }
+
+    // Handlers for inventory actions
     private static void handleCreatePlayer(InventoryService service, Scanner scanner) {
         System.out.println("Name: ");
         String playerName = scanner.nextLine();
@@ -112,37 +130,6 @@ public class InventoryCliSystem {
         }
 
         System.out.println(numberOfItems + " item(s) added to inventory!");
-    }
-
-//    public static void showInventory(WeaponRepository weaponRepo,ArmorRepository armorRepo,ConsumableRepository consumableRepo) {
-//      try {
-//          System.out.println("Your inventory: ");
-//          System.out.println("_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-");
-//          weaponRepo.readallItems();
-//          System.out.println("---------------------------------------------------- ");
-//          armorRepo.readItem();
-//          System.out.println("---------------------------------------------------- ");
-//          consumableRepo.readItem();
-//      }catch (RuntimeException e) {
-//          throw new RuntimeException("Error while reading inventory: " + e.getMessage());
-//      }
-//    }
-
-    private static void printInventory(InventoryService service) {
-        List<Item> inventory = service.findAllItems();
-
-        for (Item item : inventory) {
-            System.out.println(item);
-        }
-    }
-
-    private static void printMenu(){
-        System.out.println("\n==== Inventory Actions ====");
-        System.out.println("1: createPlayer");
-        System.out.println("2: pickupItem");
-        System.out.println("3: removeItem");
-        System.out.println("4: showIventory");
-        System.out.println("0: exit");
     }
 }
 

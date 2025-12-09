@@ -71,13 +71,6 @@ public class ArmorRepository {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                double weight = rs.getDouble("weight");
-                String category = rs.getString("category");
-                int defense = rs.getInt("defense");
-                // System.out.printf("%-3d | %-30s | %5.2f | %-6s | %-3d%n", id, name, weight, category, defense);
-
                 Armor armor = new Armor(
                         rs.getString("name"),
                         rs.getDouble("weight"),

@@ -74,16 +74,6 @@ public class WeaponRepository {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                double weight = rs.getDouble("weight");
-                int damage = rs.getInt("damage");
-                double attackSpeed = rs.getDouble("attackSpeed");
-                boolean isOneHanded = rs.getBoolean("isOneHanded");
-                String category = rs.getString("category");
-                String weaponCategory = rs.getString("weaponCategory");
-                // System.out.printf("%-3d | %-30s | %-5.2f | %-3d | %-5.2f | %-6b | %-7s | %-10s%n", id, name, weight, damage, attackSpeed, isOneHanded, category,weaponCategory);
-
                 Weapon weapon = new Weapon(
                         rs.getString("name"),
                         rs.getDouble("weight"),

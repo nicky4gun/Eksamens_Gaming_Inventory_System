@@ -71,14 +71,6 @@ public class ConsumableRepository {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                double weight = rs.getDouble("weight");
-                String category = rs.getString("category");
-                int damage = rs.getInt("damage");
-                int health = rs.getInt("health");
-                // System.out.printf("%-3d | %-30s | %5.2f | %-12s | %-3d | %-3d%n", id, name, weight, category, damage, health);
-
                 Consumable consumable = new Consumable(
                         rs.getString("name"),
                         rs.getDouble("weight"),
