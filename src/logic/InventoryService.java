@@ -118,6 +118,7 @@ public class InventoryService {
         ArmorCategory armorCategory;
         CoolArmorNames coolArmorNames;
         CoolConsumabelName coolConsumabelName;
+        WeaponType weaponType;
 
         switch (choice) {
             case 1: // Weapon
@@ -125,8 +126,8 @@ public class InventoryService {
 
                 int damage = 5 + rand.nextInt(30);
                 double attackSpeed = 0.5 + rand.nextDouble() * 2;
-                boolean isOneHanded = rand.nextBoolean();
 
+                weaponType = WeaponType.values()[rand.nextInt(WeaponType.values().length)];
                 weaponCategory = WeaponCategory.values()[rand.nextInt(WeaponCategory.values().length)];
                 coolWeaponNames = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
                 coolWeaponNames2 = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
@@ -144,7 +145,7 @@ public class InventoryService {
                     weaponName = coolWeaponNames + " " + weaponCategory + " " + coolWeaponNames2;
                 }
 
-                return new Weapon(weaponName, weight, damage, attackSpeed, isOneHanded, category, weaponCategory);
+                return new Weapon(weaponName, weight, damage, attackSpeed, weaponType, category, weaponCategory);
             case 2: //Armor
                 category = ItemCategory.ARMOR;
 

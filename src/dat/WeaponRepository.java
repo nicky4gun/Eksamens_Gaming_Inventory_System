@@ -4,6 +4,7 @@ import dat.config.DatabaseConfig;
 import models.Weapon;
 import models.enums.ItemCategory;
 import models.enums.WeaponCategory;
+import models.enums.WeaponType;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class WeaponRepository {
 
     // CRUD operations for items
     public void addItem(Weapon weapon) {
-        String sql = "INSERT INTO weapon (name, weight, category, damage, attackSpeed, isOneHanded,weaponCategory) VALUES (?, ?, ?, ?, ?, ?,?)";
+        String sql = "INSERT INTO weapon (name, weight, category, damage, attackSpeed, weaponType ,weaponCategory) VALUES (?, ?, ?, ?, ?, ?,?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -56,7 +57,7 @@ public class WeaponRepository {
             stmt.setString(3, weapon.getCategory().name());
             stmt.setInt(4, weapon.getDamage());
             stmt.setDouble(5, weapon.getAttackSpeed());
-            stmt.setBoolean(6, weapon.getIsOneHanded());
+            stmt.setString(6, weapon.getWeaponType().name());
             stmt.setString(7,weapon.getweaponCategory().name());
             stmt.executeUpdate();
 
@@ -67,7 +68,7 @@ public class WeaponRepository {
 
     public List<Weapon> readAllItems() {
         List<Weapon> weapons = new ArrayList<>();
-        String sql = "SELECT id, name, weight, damage, attackSpeed, isOneHanded, category, weaponCategory FROM weapon";
+        String sql = "SELECT id, name, weight, damage, attackSpeed, weaponType, category, weaponCategory FROM weapon";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -79,7 +80,7 @@ public class WeaponRepository {
                         rs.getDouble("weight"),
                         rs.getInt("damage"),
                         rs.getDouble("attackSpeed"),
-                        rs.getBoolean("isOneHanded"),
+                        WeaponType.valueOf(rs.getString("weaponType")),
                         ItemCategory.valueOf(rs.getString("category")),
                         WeaponCategory.valueOf(rs.getString("weaponCategory"))
                 );

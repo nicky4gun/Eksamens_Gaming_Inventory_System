@@ -2,18 +2,19 @@ package models;
 
 import models.enums.ItemCategory;
 import models.enums.WeaponCategory;
+import models.enums.WeaponType;
 
 public class Weapon extends Item {
     private int damage;
     private double attackSpeed;
-    private boolean isOneHanded;
+    private WeaponType weaponType;
     private WeaponCategory weaponCategory;
 
-    public Weapon(String name, double weight, int damage, double attackSpeed, boolean isOneHanded, ItemCategory category, WeaponCategory weaponCategory) {
+    public Weapon(String name, double weight, int damage, double attackSpeed, WeaponType weaponType , ItemCategory category, WeaponCategory weaponCategory) {
         super(name, weight, category);
         this.damage = damage;
         this.attackSpeed = attackSpeed;
-        this.isOneHanded = isOneHanded;
+        this.weaponType = weaponType;
         this.weaponCategory = weaponCategory;
     }
 
@@ -23,8 +24,8 @@ public class Weapon extends Item {
     public double getAttackSpeed() {
         return attackSpeed;
     }
-    public boolean getIsOneHanded() {
-        return isOneHanded;
+    public WeaponType getWeaponType() {
+        return weaponType;
     }
     public WeaponCategory getweaponCategory(){return weaponCategory;}
 
@@ -39,6 +40,6 @@ public class Weapon extends Item {
         return super.toString() +
                 "Damage: " + damage +
                 ", Attack Speed: " + String.format("%.2f", attackSpeed) +
-                ", isOneHanded: " + isOneHanded;
+                ", Weapon Type: " + weaponType;
     }
 }
