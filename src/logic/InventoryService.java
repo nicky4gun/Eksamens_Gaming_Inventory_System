@@ -164,7 +164,7 @@ public class InventoryService {
                 int cdamage = rand.nextInt(20);
                 int health = 5 + rand.nextInt(50);
 
-                return new Consumable(consumableName, weight, category, cdamage, health);
+                return new Consumable(consumableName, weight, category, health, cdamage);
             default:
                 System.out.println("Invalid choice. Try again!");
                 return null;
