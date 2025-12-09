@@ -1,6 +1,6 @@
 package models.enums;
 
 public enum ConsumableCategory {
-    HEALTHPOTION,
-    DAMAGEPOTION
+    HEALTH_POTION,
+    DAMAGE_POTION
 }

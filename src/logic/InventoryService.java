@@ -109,7 +109,7 @@ public class InventoryService {
 
         int choice = 1 + rand.nextInt(3);
 
-        double weight = 0.5 + (10 * rand.nextDouble());
+        double weight = 0.5 + (5 * rand.nextDouble());
 
         ItemCategory category;
         WeaponCategory weaponCategory;
