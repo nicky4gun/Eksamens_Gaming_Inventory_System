@@ -36,6 +36,6 @@ public abstract class Item {
 
     @Override
     public String toString() {
-        return category.toString() + "," + id + ", " + name + ", " + String.format("%.2f kg", weight) + ", ";
+        return id + " | " + category.toString() + ", " + name + ", " + String.format("%.2f kg", weight) + ", ";
     }
 }

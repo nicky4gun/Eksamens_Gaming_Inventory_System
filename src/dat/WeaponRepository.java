@@ -63,8 +63,24 @@ public class WeaponRepository {
 
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
-                int id = keys.getInt(1);
-                weapon.setId(id);
+                int weaponId = keys.getInt(1);
+                weapon.setId(weaponId);
+            }
+
+            String sqlItem = "INSERT INTO item (weapon_id) VALUES (?)";
+
+            try {
+                PreparedStatement itemStmt = conn.prepareStatement(sqlItem, Statement.RETURN_GENERATED_KEYS);
+                itemStmt.setInt(1, weapon.getId());
+                itemStmt.executeUpdate();
+
+                ResultSet itemKeys = itemStmt.getGeneratedKeys();
+                if (itemKeys.next()) {
+                    int itemId = itemKeys.getInt(1);
+                    weapon.setId(itemId);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error: Unable to insert item");
             }
 
         } catch (SQLException e) {
@@ -74,14 +90,19 @@ public class WeaponRepository {
 
     public List<Weapon> readAllWeapons() {
         List<Weapon> weapons = new ArrayList<>();
-        String sql = "SELECT id, name, weight, damage, attackSpeed, weaponType, category, weaponCategory FROM weapon";
+        String sql = "SELECT weapon_id, name, weight, damage, attackSpeed, weaponType, category, weaponCategory FROM weapon";
+        String newSQL = """
+                SELECT i.id AS item_id, w.weapon_id, w.name, w.weight, w.damage, w.attackSpeed, w.weaponType, w.category, w.weaponCategory
+                FROM item i
+                JOIN weapon w ON i.weapon_id = w.weapon_id
+                """;
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
+            PreparedStatement stmt = conn.prepareStatement(newSQL);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int itemId = rs.getInt("item_id");
                 String name = rs.getString("name");
                 double weight = rs.getDouble("weight");
                 int damage = rs.getInt("damage");
@@ -90,7 +111,7 @@ public class WeaponRepository {
                 ItemCategory category =  ItemCategory.valueOf(rs.getString("category"));
                 WeaponCategory weaponCategory = WeaponCategory.valueOf(rs.getString("weaponCategory"));
 
-                Weapon weapon = new Weapon(id, name, weight, damage, attackSpeed, weaponType, category, weaponCategory);
+                Weapon weapon = new Weapon(itemId, name, weight, damage, attackSpeed, weaponType, category, weaponCategory);
                 weapons.add(weapon);
             }
 
@@ -123,7 +144,7 @@ public class WeaponRepository {
     }
 
     public void deleteItemById(int id) {
-        String sql = "DELETE FROM weapon WHERE id = ?";
+        String sql = "DELETE FROM item WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);

@@ -58,8 +58,24 @@ public class ArmorRepository {
 
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
-                int id = keys.getInt(1);
-                armor.setId(id);
+                int armorId = keys.getInt(1);
+                armor.setId(armorId);
+            }
+
+            String sqlItem = "INSERT INTO item (armor_id) VALUES (?)";
+
+            try {
+                PreparedStatement itemStmt = conn.prepareStatement(sqlItem, Statement.RETURN_GENERATED_KEYS);
+                itemStmt.setInt(1, armor.getId());
+                itemStmt.executeUpdate();
+
+                ResultSet itemKeys = itemStmt.getGeneratedKeys();
+                if (itemKeys.next()) {
+                    int itemId = itemKeys.getInt(1);
+                    armor.setId(itemId);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error: Unable to insert item");
             }
 
         } catch (SQLException e) {
@@ -69,20 +85,25 @@ public class ArmorRepository {
 
     public List<Armor> readAllArmor() {
         List<Armor> armors = new ArrayList<>();
-        String sql = "SELECT id, name, weight, category, defense  FROM armor";
+        String sql = "SELECT armor_id, name, weight, category, defense  FROM armor";
+        String newSQL = """
+                SELECT i.id AS item_id, a.armor_id, a.name, a.weight, a.category, a.defense
+                FROM item i
+                JOIN armor a ON i.armor_id = a.armor_id
+                """;
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
+            PreparedStatement stmt = conn.prepareStatement(newSQL);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int itemId = rs.getInt("item_id");
                 String name = rs.getString("name");
                 double weight  = rs.getDouble("weight");
                 ItemCategory category = ItemCategory.valueOf(rs.getString("category"));
                 int defense = rs.getInt("defense");
 
-                Armor armor = new Armor(id, name, weight, category, defense);
+                Armor armor = new Armor(itemId, name, weight, category, defense);
                 armors.add(armor);
             }
 
@@ -113,7 +134,7 @@ public class ArmorRepository {
     }
 
     public void deleteItemById(int id) {
-        String sql = "DELETE FROM armor WHERE id = ?";
+        String sql = "DELETE FROM item WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);

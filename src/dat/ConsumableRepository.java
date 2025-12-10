@@ -59,8 +59,24 @@ public class ConsumableRepository {
 
             ResultSet keys = stmt.getGeneratedKeys();
             if (keys.next()) {
-                int id = keys.getInt(1);
-                consumable.setId(id);
+                int consumableId = keys.getInt(1);
+                consumable.setId(consumableId);
+            }
+
+            String sqlItem = "INSERT INTO item (consumable_id) VALUES (?)";
+
+            try {
+                PreparedStatement itemStmt = conn.prepareStatement(sqlItem, Statement.RETURN_GENERATED_KEYS);
+                itemStmt.setInt(1, consumable.getId());
+                itemStmt.executeUpdate();
+
+                ResultSet itemKeys = itemStmt.getGeneratedKeys();
+                if (itemKeys.next()) {
+                    int itemId = itemKeys.getInt(1);
+                    consumable.setId(itemId);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Error: Unable to insert item");
             }
 
         } catch (SQLException e) {
@@ -70,21 +86,26 @@ public class ConsumableRepository {
 
     public List<Consumable> readAllConsumables() {
         List<Consumable> consumables = new ArrayList<>();
-        String sql = "SELECT id, name, weight, category, damage, health FROM consumable";
+        String sql = "SELECT consumable_id, name, weight, category, damage, health FROM consumable";
+        String newSQL = """
+                SELECT i.id AS item_id, c.consumable_id, c.name, c.weight, c.category, c.damage, c.health
+                FROM item i
+                JOIN consumable c ON i.consumable_id = c.consumable_id
+                """;
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
+            PreparedStatement stmt = conn.prepareStatement(newSQL);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int itemId = rs.getInt("item_id");
                 String name = rs.getString("name");
                 double weight = rs.getDouble("weight");
                 ItemCategory category = ItemCategory.valueOf(rs.getString("category"));
                 int damage = rs.getInt("damage");
                 int health = rs.getInt("health");
 
-                Consumable consumable = new Consumable(id, name, weight, category, damage, health);
+                Consumable consumable = new Consumable(itemId, name, weight, category, damage, health);
                 consumables.add(consumable);
             }
 
@@ -115,7 +136,7 @@ public class ConsumableRepository {
     }
 
     public void deleteItemById(int id) {
-        String sql = "DELETE FROM consumable WHERE id = ?";
+        String sql = "DELETE FROM item WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
