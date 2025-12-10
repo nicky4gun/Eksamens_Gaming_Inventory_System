@@ -50,7 +50,7 @@ public class WeaponRepository {
         String sql = "INSERT INTO weapon (name, weight, category, damage, attackSpeed, weaponType ,weaponCategory) VALUES (?, ?, ?, ?, ?, ?,?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
+            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             stmt.setString(1, weapon.getName());
             stmt.setDouble(2, weapon.getWeight());
@@ -58,15 +58,21 @@ public class WeaponRepository {
             stmt.setInt(4, weapon.getDamage());
             stmt.setDouble(5, weapon.getAttackSpeed());
             stmt.setString(6, weapon.getWeaponType().name());
-            stmt.setString(7,weapon.getweaponCategory().name());
+            stmt.setString(7,weapon.getWeaponCategory().name());
             stmt.executeUpdate();
+
+            ResultSet keys = stmt.getGeneratedKeys();
+            if (keys.next()) {
+                int id = keys.getInt(1);
+                weapon.setId(id);
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("An error occurred while trying to add item to database.", e);
         }
     }
 
-    public List<Weapon> readAllItems() {
+    public List<Weapon> readAllWeapons() {
         List<Weapon> weapons = new ArrayList<>();
         String sql = "SELECT id, name, weight, damage, attackSpeed, weaponType, category, weaponCategory FROM weapon";
 
@@ -75,16 +81,16 @@ public class WeaponRepository {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Weapon weapon = new Weapon(
-                        rs.getString("name"),
-                        rs.getDouble("weight"),
-                        rs.getInt("damage"),
-                        rs.getDouble("attackSpeed"),
-                        WeaponType.valueOf(rs.getString("weaponType")),
-                        ItemCategory.valueOf(rs.getString("category")),
-                        WeaponCategory.valueOf(rs.getString("weaponCategory"))
-                );
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                double weight = rs.getDouble("weight");
+                int damage = rs.getInt("damage");
+                double attackSpeed = rs.getDouble("attackSpeed");
+                WeaponType weaponType = WeaponType.valueOf(rs.getString("weaponType"));
+                ItemCategory category =  ItemCategory.valueOf(rs.getString("category"));
+                WeaponCategory weaponCategory = WeaponCategory.valueOf(rs.getString("weaponCategory"));
 
+                Weapon weapon = new Weapon(id, name, weight, damage, attackSpeed, weaponType, category, weaponCategory);
                 weapons.add(weapon);
             }
 
@@ -116,13 +122,17 @@ public class WeaponRepository {
         }
     }
 
-    public void deleteItem(String name) {
-        String sql = "DELETE FROM weapon WHERE name = ?";
+    public void deleteItemById(int id) {
+        String sql = "DELETE FROM weapon WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, name);
-            stmt.executeUpdate();
+            stmt.setInt(1, id);
+            int rows = stmt.executeUpdate();
+
+            if (rows == 0) {
+                System.out.println("No weapon with id " + id + " found");
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("An error occurred while deleting item.", e);

@@ -108,10 +108,10 @@ public class InventoryCliSystem {
     }
 
     private static void handleDeleteItem(InventoryService service, Scanner scanner) {
-        System.out.println("Enter name of item: ");
-        String name = scanner.nextLine();
+        System.out.println("Enter item to delete (id): ");
+        int id = scanner.nextInt();
 
-        service.deleteItemFromInventory(name);
+        service.deleteItemFromInventory(id);
         System.out.println("Item deleted successfully!");
     }
 
@@ -121,7 +121,9 @@ public class InventoryCliSystem {
         scanner.nextLine();
 
         for (int i = 0; i < numberOfItems; i++) {
+
             Item randomItem = service.createRandomItem();
+
             System.out.println(randomItem);
 
             if (randomItem != null) {

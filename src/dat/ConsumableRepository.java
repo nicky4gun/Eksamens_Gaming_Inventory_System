@@ -48,7 +48,7 @@ public class ConsumableRepository {
         String sql = "INSERT INTO consumable (name, weight, category, health, damage) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
+            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             stmt.setString(1, consumable.getName());
             stmt.setDouble(2, consumable.getWeight());
@@ -57,12 +57,18 @@ public class ConsumableRepository {
             stmt.setInt(5, consumable.getHealth());
             stmt.executeUpdate();
 
+            ResultSet keys = stmt.getGeneratedKeys();
+            if (keys.next()) {
+                int id = keys.getInt(1);
+                consumable.setId(id);
+            }
+
         } catch (SQLException e) {
             throw new RuntimeException("An error occurred while trying to add item to database.", e);
         }
     }
 
-    public List<Consumable> readAllItems() {
+    public List<Consumable> readAllConsumables() {
         List<Consumable> consumables = new ArrayList<>();
         String sql = "SELECT id, name, weight, category, damage, health FROM consumable";
 
@@ -71,14 +77,14 @@ public class ConsumableRepository {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Consumable consumable = new Consumable(
-                        rs.getString("name"),
-                        rs.getDouble("weight"),
-                        ItemCategory.valueOf(rs.getString("category")),
-                        rs.getInt("damage"),
-                        rs.getInt("health")
-                );
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                double weight = rs.getDouble("weight");
+                ItemCategory category = ItemCategory.valueOf(rs.getString("category"));
+                int damage = rs.getInt("damage");
+                int health = rs.getInt("health");
 
+                Consumable consumable = new Consumable(id, name, weight, category, damage, health);
                 consumables.add(consumable);
             }
 
@@ -108,13 +114,17 @@ public class ConsumableRepository {
         }
     }
 
-    public void deleteItem(String name) {
-        String sql = "DELETE FROM consumable WHERE name = ?";
+    public void deleteItemById(int id) {
+        String sql = "DELETE FROM consumable WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, name);
-            stmt.executeUpdate();
+            stmt.setInt(1, id );
+            int rows = stmt.executeUpdate();
+
+            if (rows == 0) {
+                System.out.println("No weapon with id " + id + " found");
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("An error occurred while deleting item.", e);

@@ -5,9 +5,14 @@ import models.enums.ItemCategory;
 public class Armor extends Item {
     private int defense;
 
-    public Armor(String name, double weight, ItemCategory category, int defense) {
-    super(name, weight, category);
+    public Armor(int id, String name, double weight, ItemCategory category, int defense) {
+    super(id , name, weight, category);
     this.defense = defense;
+    }
+
+    public Armor(String name, double weight,  ItemCategory category, int defense) {
+        super(name, weight, category);
+        this.defense = defense;
     }
 
     public int getDefense() {

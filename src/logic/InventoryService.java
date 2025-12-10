@@ -88,25 +88,24 @@ public class InventoryService {
         }
     }
 
-    public void deleteItemFromInventory(String name) {
-        weaponRepository.deleteItem(name);
-        armorRepository.deleteItem(name);
-        consumableRepository.deleteItem(name);
+    public void deleteItemFromInventory(int id ) {
+        weaponRepository.deleteItemById(id);
+        armorRepository.deleteItemById(id);
+        consumableRepository.deleteItemById(id);
     }
 
     public List<Item> findAllItems() {
         List<Item> items = new ArrayList<>();
 
-        items.addAll(weaponRepository.readAllItems());
-        items.addAll(armorRepository.readAllItems());
-        items.addAll(consumableRepository.readAllItems());
+        items.addAll(weaponRepository.readAllWeapons());
+        items.addAll(armorRepository.readAllArmor());
+        items.addAll(consumableRepository.readAllConsumables());
 
         return items;
     }
 
     public Item createRandomItem() {
         Random rand = new Random();
-
         int choice = 1 + rand.nextInt(3);
 
         double weight = 0.5 + (5 * rand.nextDouble());

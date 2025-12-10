@@ -10,11 +10,20 @@ public class Weapon extends Item {
     private WeaponType weaponType;
     private WeaponCategory weaponCategory;
 
-    public Weapon(String name, double weight, int damage, double attackSpeed, WeaponType weaponType , ItemCategory category, WeaponCategory weaponCategory) {
-        super(name, weight, category);
+    public Weapon(int id, String name, double weight, int damage, double attackSpeed, WeaponType weaponType , ItemCategory category, WeaponCategory weaponCategory) {
+        super(id, name, weight, category);
         this.damage = damage;
         this.attackSpeed = attackSpeed;
         this.weaponType = weaponType;
+        this.weaponCategory = weaponCategory;
+    }
+
+    public Weapon(String name, double weight, int damage, double attackSpeed,
+                  WeaponType type, ItemCategory category, WeaponCategory weaponCategory) {
+        super(name, weight, category);
+        this.damage = damage;
+        this.attackSpeed = attackSpeed;
+        this.weaponType = type;
         this.weaponCategory = weaponCategory;
     }
 
@@ -27,7 +36,7 @@ public class Weapon extends Item {
     public WeaponType getWeaponType() {
         return weaponType;
     }
-    public WeaponCategory getweaponCategory(){return weaponCategory;}
+    public WeaponCategory getWeaponCategory(){return weaponCategory;}
 
 
     @Override
