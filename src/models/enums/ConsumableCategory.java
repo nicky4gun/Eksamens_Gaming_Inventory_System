@@ -5,4 +5,5 @@ public enum ConsumableCategory {
     DAMAGE_POTION,
     ARROWS,
     BOLTS
+
 }

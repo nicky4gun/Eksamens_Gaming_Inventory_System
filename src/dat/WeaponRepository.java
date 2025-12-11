@@ -45,7 +45,7 @@ public class WeaponRepository {
         }
     }
 
-    // CRUD operations for items
+    // CRUD operations for weapons
     public void addItem(Weapon weapon) {
         String sql = "INSERT INTO weapon (name, weight, category, damage, attackSpeed, weaponType ,weaponCategory) VALUES (?, ?, ?, ?, ?, ?,?)";
 

@@ -4,15 +4,12 @@ import dat.*;
 import models.*;
 import models.enums.*;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
 public class InventoryService {
     private final PlayerRepository playerRepository;
-    // private final ItemRepository itemRepository;
     private final WeaponRepository weaponRepository;
     private final ArmorRepository armorRepository;
     private final ConsumableRepository consumableRepository;
@@ -20,6 +17,8 @@ public class InventoryService {
     private final int MAX_WEIGHT = 50;
     private final int MAX_SLOTS =192;
     private int unlockedSlots = 32;
+
+    private final Random rand = new Random();
 
     public InventoryService(PlayerRepository playerRepository, WeaponRepository weaponRepository, ArmorRepository armorRepository, ConsumableRepository consumableRepository) {
         this.playerRepository = playerRepository;
@@ -29,17 +28,17 @@ public class InventoryService {
     }
 
     // Game logic
-    private void checkWeight(Item item) throws SQLException{
+    private void checkWeight(Item item) {
         double totalWeight = getTotalWeightFromDb();
         if (totalWeight + item.getWeight() > MAX_WEIGHT) {
-            throw new IllegalArgumentException("Cannot add item: item exceeds max weight of " + MAX_WEIGHT);
-        }
+            throw new IllegalStateException("Can't add item: inventory exceeds max weight of " + MAX_WEIGHT);
+        };
     }
 
-    private void checkSlotsAvailable() throws SQLException {
+    private void checkSlotsAvailable() {
         int usedSlots = getUsedSlotsFromDb();
         if (usedSlots + 1 > unlockedSlots) {
-            throw new IllegalArgumentException("Cannot add item: no free slots available");
+            throw new IllegalStateException("Can't add item: no free slots available");
         }
     }
 
@@ -67,25 +66,21 @@ public class InventoryService {
     }
 
     public void addItem(Item item) {
-        try {
-            checkWeight(item);
-            checkSlotsAvailable();
+        checkWeight(item);
+        checkSlotsAvailable();
 
-            switch (item.getItemType()) {
-                case WEAPON:
-                    weaponRepository.addItem((Weapon) item);
-                    break;
-                case ARMOR:
-                    armorRepository.addItem((Armor) item);
-                    break;
-                case CONSUMABLE:
-                    consumableRepository.addItem((Consumable) item);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown item type: " + item.getItemType());
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error occurred while checking limits");
+        switch (item.getItemType()) {
+            case WEAPON:
+                weaponRepository.addItem((Weapon) item);
+                break;
+            case ARMOR:
+                armorRepository.addItem((Armor) item);
+                break;
+            case CONSUMABLE:
+                consumableRepository.addItem((Consumable) item);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown item type: " + item.getItemType());
         }
     }
 
@@ -110,10 +105,7 @@ public class InventoryService {
     }
 
     public Item createRandomItem() {
-        Random rand = new Random();
         int choice = 1 + rand.nextInt(3);
-
-        double weight = 0.5 + (5 * rand.nextDouble());
 
         ItemCategory category;
         WeaponCategory weaponCategory;
@@ -122,12 +114,13 @@ public class InventoryService {
         ArmorCategory armorCategory;
         CoolArmorNames coolArmorNames;
         CoolConsumabelName coolConsumabelName;
+        ConsumableCategory consumableCategory;
         WeaponType weaponType;
 
         switch (choice) {
             case 1: // Weapon
                 category = ItemCategory.WEAPON;
-
+                double weight = 0.5 + (5 * rand.nextDouble());
                 int damage = 5 + rand.nextInt(30);
                 double attackSpeed = 0.5 + rand.nextDouble() * 2;
 
@@ -152,7 +145,7 @@ public class InventoryService {
                 return new Weapon(weaponName, weight, damage, attackSpeed, weaponType, category, weaponCategory);
             case 2: //Armor
                 category = ItemCategory.ARMOR;
-
+                weight = 0.5 + (5 * rand.nextDouble());
                 armorCategory = ArmorCategory.values()[rand.nextInt(ArmorCategory.values().length)];
                 coolArmorNames = CoolArmorNames.values()[rand.nextInt(CoolArmorNames.values().length)];
                 String armorName = armorCategory.name() + " " + coolArmorNames;
@@ -164,12 +157,26 @@ public class InventoryService {
                 category = ItemCategory.CONSUMABLE;
 
                 coolConsumabelName = CoolConsumabelName.values()[rand.nextInt(CoolConsumabelName.values().length)];
+                consumableCategory = ConsumableCategory.values()[rand.nextInt(ConsumableCategory.values().length)];
                 String consumableName = coolConsumabelName.name();
 
-                int cdamage = rand.nextInt(20);
-                int health = 5 + rand.nextInt(50);
+                weight = 0.5;
+                int health = 0;
+                int cdamage = 0;
+                boolean  stackable = false;
+                int quantity = 0;
 
-                return new Consumable(consumableName, weight, category, health, cdamage);
+                if (consumableCategory == ConsumableCategory.HEALTH_POTION) {
+                    health = 50;
+                } else if (consumableCategory == ConsumableCategory.DAMAGE_POTION) {
+                    cdamage = 20;
+                } else if (consumableCategory == consumableCategory.ARROWS || consumableCategory == consumableCategory.BOLTS ) {
+                    stackable = true;
+                    quantity = 12;
+                    consumableName = "arrows";
+                }
+
+                return new Consumable(consumableName, weight, category, health, cdamage, consumableCategory, stackable, quantity);
             default:
                 System.out.println("Invalid choice. Try again!");
                 return null;

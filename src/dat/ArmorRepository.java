@@ -43,7 +43,7 @@ public class ArmorRepository {
         }
     }
 
-    // CRUD operations for weapons
+    // CRUD operations for armor
     public void addItem( Armor armor) {
         String sql = "INSERT INTO armor (name, weight, defense, category) VALUES (?, ?, ?, ?)";
 
@@ -142,7 +142,7 @@ public class ArmorRepository {
             int rows = stmt.executeUpdate();
 
             if (rows == 0) {
-                System.out.println("No weapon with id " + id + " found");
+                System.out.println("No armor with id " + id + " found");
             }
 
         } catch (SQLException e) {

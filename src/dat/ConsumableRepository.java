@@ -2,6 +2,7 @@ package dat;
 
 import dat.config.DatabaseConfig;
 import models.Consumable;
+import models.enums.ConsumableCategory;
 import models.enums.ItemCategory;
 
 import java.sql.*;
@@ -43,9 +44,9 @@ public class ConsumableRepository {
         }
     }
 
-    // CRUD operations for items
-    public void addItem( Consumable consumable) {
-        String sql = "INSERT INTO consumable (name, weight, category, health, damage) VALUES (?, ?, ?, ?, ?)";
+    // CRUD operations for consumables
+    public void addItem(Consumable consumable) {
+        String sql = "INSERT INTO consumable (name, weight, category, health, damage, consumableType, stack, quantity) VALUES (?, ?, ?, ?, ?, ?,? , ?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -55,6 +56,10 @@ public class ConsumableRepository {
             stmt.setString(3, consumable.getCategory().name());
             stmt.setDouble(4, consumable.getDamage());
             stmt.setInt(5, consumable.getHealth());
+            stmt.setString(6, consumable.getType().name());
+            stmt.setBoolean(7, consumable.getStackable());
+            stmt.setInt(8, consumable.getQuantity());
+
             stmt.executeUpdate();
 
             ResultSet keys = stmt.getGeneratedKeys();
@@ -88,7 +93,7 @@ public class ConsumableRepository {
         List<Consumable> consumables = new ArrayList<>();
         String sql = "SELECT consumable_id, name, weight, category, damage, health FROM consumable";
         String newSQL = """
-                SELECT i.id AS item_id, c.consumable_id, c.name, c.weight, c.category, c.damage, c.health
+                SELECT i.id AS item_id, c.consumable_id, c.name, c.weight, c.category, c.damage, c.health, c.consumableType, c.stack, c.quantity
                 FROM item i
                 JOIN consumable c ON i.consumable_id = c.consumable_id
                 """;
@@ -104,8 +109,10 @@ public class ConsumableRepository {
                 ItemCategory category = ItemCategory.valueOf(rs.getString("category"));
                 int damage = rs.getInt("damage");
                 int health = rs.getInt("health");
-
-                Consumable consumable = new Consumable(itemId, name, weight, category, damage, health);
+                ConsumableCategory consumableType = ConsumableCategory.valueOf(rs.getString("consumableType"));
+                boolean stackable = rs.getBoolean("stack");
+                int quantity = rs.getInt("quantity");
+                Consumable consumable = new Consumable(itemId, name, weight, category, damage, health, consumableType, stackable, quantity);
                 consumables.add(consumable);
             }
 
@@ -144,7 +151,7 @@ public class ConsumableRepository {
             int rows = stmt.executeUpdate();
 
             if (rows == 0) {
-                System.out.println("No weapon with id " + id + " found");
+                System.out.println("No consumable with id " + id + " found");
             }
 
         } catch (SQLException e) {

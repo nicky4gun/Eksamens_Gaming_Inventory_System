@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class InventoryCliSystem {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         DatabaseConfig config = new DatabaseConfig();
 
         PlayerRepository playerRepository = new PlayerRepository(config);
@@ -41,7 +41,9 @@ public class InventoryCliSystem {
     public static void run(InventoryService service, Scanner scanner) {
         printMenu();
 
-        while (true) {
+        boolean running = true;
+
+        while (running) {
             System.out.print("Choose action: ");
             int method = scanner.nextInt();
             scanner.nextLine();
@@ -62,7 +64,7 @@ public class InventoryCliSystem {
                     break;
                 case 0:
                     System.out.println("Exiting Inventory...");
-                    return;
+                    running = false;
                 default:
                     System.out.println("Invalid choice. Try again!");
             }
@@ -110,11 +112,22 @@ public class InventoryCliSystem {
     }
 
     private static void handleDeleteItem(InventoryService service, Scanner scanner) {
-        System.out.print("Enter item to delete (id): ");
-        int id = scanner.nextInt();
+        boolean running = true;
 
-        service.deleteItemFromInventory(id);
-        System.out.println("Item deleted successfully!");
+        while (running) {
+            System.out.print("Enter item to delete (id) - (0 to exit): ");
+            int id = scanner.nextInt();
+
+            if (id < 0) {
+                System.out.println("Not a valid id. Try again!");
+            } else if (id == 0) {
+                System.out.println("Exiting delete-mode...");
+                running = false;
+            } else {
+                service.deleteItemFromInventory(id);
+                System.out.println("Item deleted successfully!");
+            }
+        }
     }
 
     private static void handlePickUpItem(InventoryService service, Scanner scanner) {
