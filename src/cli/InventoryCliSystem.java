@@ -88,16 +88,18 @@ public class InventoryCliSystem {
 
     // Handlers for inventory actions
     private static void handleCreatePlayer(InventoryService service, Scanner scanner) {
-        System.out.println("Name: ");
+        System.out.print("Name: ");
         String playerName = scanner.nextLine();
 
-        System.out.println("Credits: ");
+        System.out.print("Credits: ");
         int credits = scanner.nextInt();
         scanner.nextLine();
 
-        System.out.println("Level: ");
+        System.out.print("Level: ");
         int level = scanner.nextInt();
         scanner.nextLine();
+
+        if (playerName == null || playerName.isBlank()) {System.out.println("Name cannot be empty, Try again!");}
 
         try {
             service.createPlayer(playerName, credits, level);
@@ -108,7 +110,7 @@ public class InventoryCliSystem {
     }
 
     private static void handleDeleteItem(InventoryService service, Scanner scanner) {
-        System.out.println("Enter item to delete (id): ");
+        System.out.print("Enter item to delete (id): ");
         int id = scanner.nextInt();
 
         service.deleteItemFromInventory(id);
@@ -116,22 +118,31 @@ public class InventoryCliSystem {
     }
 
     private static void handlePickUpItem(InventoryService service, Scanner scanner) {
-        System.out.println("Choose number of items to pick up: ");
-        int numberOfItems = scanner.nextInt();
-        scanner.nextLine();
+        boolean running = true;
 
-        for (int i = 0; i < numberOfItems; i++) {
+        while (running) {
+            System.out.print("Choose number of items to pick up: ");
+            int numberOfItems = scanner.nextInt();
+            scanner.nextLine();
 
-            Item randomItem = service.createRandomItem();
+            for (int i = 0; i < numberOfItems; i++) {
 
-            System.out.println(randomItem);
+                Item randomItem = service.createRandomItem();
 
-            if (randomItem != null) {
-                service.addItem(randomItem);
+                System.out.println(randomItem);
+
+                if (randomItem != null) {
+                    service.addItem(randomItem);
+                }
+            }
+
+            if (numberOfItems < 0) {
+                System.out.println("Invalid number, must be positive or 0.");
+            } else {
+                System.out.println(numberOfItems + " item(s) added to inventory!");
+                running = false;
             }
         }
-
-        System.out.println(numberOfItems + " item(s) added to inventory!");
     }
 }
 

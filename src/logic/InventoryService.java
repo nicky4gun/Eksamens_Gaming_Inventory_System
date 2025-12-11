@@ -6,6 +6,7 @@ import models.enums.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -100,6 +101,10 @@ public class InventoryService {
         items.addAll(weaponRepository.readAllWeapons());
         items.addAll(armorRepository.readAllArmor());
         items.addAll(consumableRepository.readAllConsumables());
+
+        if (items.isEmpty()) {
+            System.out.println("Your Inventory is Empty!");
+        }
 
         return items;
     }
