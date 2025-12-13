@@ -8,6 +8,7 @@ import models.enums.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -31,22 +32,29 @@ public class InventoryCliSystem {
             System.out.println("Connection failed: " + e.getMessage());
         }
 
-        // Shows player how much space is currently used in their inventory
-        System.out.printf("Inventory (weight): %.2f kg%n", service.getTotalWeightFromDb());
-        System.out.println("Slots used: " + service.getUsedSlotsFromDb());
+        printInventoryStats(service);
+
+        System.out.println(); // Print empty line
 
         run(service, scanner);
     }
 
     public static void run(InventoryService service, Scanner scanner) {
         printMenu();
-
         boolean running = true;
 
         while (running) {
             System.out.print("Choose action: ");
-            int method = scanner.nextInt();
-            scanner.nextLine();
+
+            int method;
+            try {
+                method = scanner.nextInt();
+                scanner.nextLine();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input! Please enter a number.");
+                scanner.nextLine();
+                continue;
+            }
 
             switch (method) {
                 case 1:
@@ -65,23 +73,33 @@ public class InventoryCliSystem {
                 case 0:
                     System.out.println("Exiting Inventory...");
                     running = false;
+                    break;
                 default:
                     System.out.println("Invalid choice. Try again!");
             }
         }
     }
 
+    private static void printInventoryStats(InventoryService service) {
+        // Shows player how much space is currently used in their inventory
+        System.out.printf("Inventory (weight): %.2f kg%n", service.getTotalWeightFromDb());
+        System.out.println("Slots used: " + service.getUsedSlotsFromDb());
+    }
+
+
     private static void printMenu(){
         System.out.println("\n==== Inventory Actions ====");
-        System.out.println("1: createPlayer");
-        System.out.println("2: pickupItem");
-        System.out.println("3: removeItem");
-        System.out.println("4: showIventory");
-        System.out.println("0: exit");
+        System.out.println("1: Add new Player");
+        System.out.println("2: Pick up Item");
+        System.out.println("3: Remove item from Inventory");
+        System.out.println("4: Show Inventory");
+        System.out.println("0: Exit");
     }
 
     private static void printInventory(InventoryService service) {
         List<Item> inventory = service.findAllItems();
+
+        printInventoryStats(service);
 
         for (Item item : inventory) {
             System.out.println(item);
@@ -90,24 +108,36 @@ public class InventoryCliSystem {
 
     // Handlers for inventory actions
     private static void handleCreatePlayer(InventoryService service, Scanner scanner) {
-        System.out.print("Name: ");
-        String playerName = scanner.nextLine();
-
-        System.out.print("Credits: ");
-        int credits = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.print("Level: ");
-        int level = scanner.nextInt();
-        scanner.nextLine();
-
-        if (playerName == null || playerName.isBlank()) {System.out.println("Name cannot be empty, Try again!");}
-
         try {
+            System.out.print("Name: ");
+            String playerName = scanner.nextLine();
+
+            if (playerName == null || playerName.isBlank()) {
+                System.out.println("Name cannot be empty, Try again!");
+                return;
+            }
+
+            System.out.print("Credits: ");
+            int credits = scanner.nextInt();
+            scanner.nextLine();
+
+            System.out.print("Level: ");
+            int level = scanner.nextInt();
+            scanner.nextLine();
+
+            if (credits < 0 || level < 1 || level > 100) {
+                System.out.println("Invalid values. Unable to create Player.");
+                return;
+            }
+
             service.createPlayer(playerName, credits, level);
             System.out.println("Player added successfully!");
+
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid Input! Please enter a number.");
+            scanner.nextLine();
         } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
@@ -116,46 +146,69 @@ public class InventoryCliSystem {
 
         while (running) {
             System.out.print("Enter item to delete (id) - (0 to exit): ");
-            int id = scanner.nextInt();
+
+            int id;
+            try {
+                id = scanner.nextInt();
+                scanner.nextLine();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input! Please enter a number.");
+                scanner.nextLine();
+                continue;
+            }
 
             if (id < 0) {
                 System.out.println("Not a valid id. Try again!");
             } else if (id == 0) {
-                System.out.println("Exiting delete-mode...");
+                printInventoryStats(service);
+                System.out.println("\nExiting delete-mode...");
                 running = false;
             } else {
-                service.deleteItemFromInventory(id);
-                System.out.println("Item deleted successfully!");
+                try {
+                    service.deleteItemFromInventory(id);
+                    System.out.println("Item deleted successfully!");
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
             }
         }
     }
 
     private static void handlePickUpItem(InventoryService service, Scanner scanner) {
-        boolean running = true;
+        System.out.print("Choose number of items to pick up: ");
 
-        while (running) {
-            System.out.print("Choose number of items to pick up: ");
-            int numberOfItems = scanner.nextInt();
+        int numberOfItems;
+        try {
+            numberOfItems = scanner.nextInt();
             scanner.nextLine();
 
-            for (int i = 0; i < numberOfItems; i++) {
-
-                Item randomItem = service.createRandomItem();
-
-                System.out.println(randomItem);
-
-                if (randomItem != null) {
-                    service.addItem(randomItem);
-                }
+            if (numberOfItems <= 0) {
+                System.out.println("Please enter a positive number.");
+                return;
             }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input! Please enter a number.");
+            scanner.nextLine();
+            return;
+        }
 
-            if (numberOfItems < 0) {
-                System.out.println("Invalid number, must be positive or 0.");
-            } else {
-                System.out.println(numberOfItems + " item(s) added to inventory!");
-                running = false;
+        int succesfullyAdded = 0;
+
+        for (int i = 0; i < numberOfItems; i++) {
+
+            Item randomItem = service.createRandomItem();
+            System.out.println(randomItem);
+
+            try {
+                service.addItem(randomItem);
+                succesfullyAdded++;
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                break;
             }
         }
+
+        System.out.println(succesfullyAdded + " item(s) added to inventory!");
     }
 }
 
