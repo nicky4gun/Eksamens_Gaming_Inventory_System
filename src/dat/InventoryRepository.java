@@ -13,11 +13,13 @@ public class InventoryRepository {
     private final WeaponRepository weaponRepository;
     private final ArmorRepository armorRepository;
     private final ConsumableRepository consumableRepository;
+    private final Sorting sort;
 
-    public InventoryRepository(WeaponRepository weaponRepository, ArmorRepository armorRepository, ConsumableRepository consumableRepository) {
+    public InventoryRepository(WeaponRepository weaponRepository, ArmorRepository armorRepository, ConsumableRepository consumableRepository, Sorting sort) {
         this.weaponRepository = weaponRepository;
         this.armorRepository = armorRepository;
         this.consumableRepository = consumableRepository;
+        this.sort = sort;
     }
 
     // === Searching ===
@@ -45,38 +47,38 @@ public class InventoryRepository {
     // === Sorting ===
     public List<Item> findAllItemsSortedById() {
         List<Item> items = findAllItems();
-        Sorting.sortById(items);
+        sort.sortById(items);
         return items;
     }
 
     public List<Item> findAllItemsSortedByName() {
         List<Item> items = findAllItems();
-        Sorting.sortByName(items);
+        sort.sortByName(items);
         return items;
     }
 
     public List<Item> findAllItemsSortedByWeight() {
         List<Item> items = findAllItems();
-        Sorting.sortByWeight(items);
+        sort.sortByWeight(items);
         return items;
     }
 
     public List<Item> findAllItemsSortedByType() {
         List<Item> items = findAllItems();
-        Sorting.sortByType(items);
+        sort.sortByType(items);
         return items;
     }
 
     public List<Weapon> findAllWeaponsSortedCategory(){
         List<Weapon> weapons = findAllWeapons();
-        Sorting.sortByCategory(weapons);
+        sort.sortByCategory(weapons);
         return weapons;
     }
 
     public List<Armor> findAllArmorSortedCategory(){
         List<Armor> armors = findAllArmor();
-        Sorting.sortByArmor(armors);
-      return armors;
+        sort.sortByArmor(armors);
+        return armors;
     }
 
 }

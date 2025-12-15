@@ -83,17 +83,10 @@ public class InventoryService {
         checkSlotsAvailable();
 
         switch (item.getItemType()) {
-            case WEAPON:
-                weaponRepository.addItem((Weapon) item);
-                break;
-            case ARMOR:
-                armorRepository.addItem((Armor) item);
-                break;
-            case CONSUMABLE:
-                consumableRepository.addItem((Consumable) item);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown item type: " + item.getItemType());
+            case WEAPON -> weaponRepository.addItem((Weapon) item);
+            case ARMOR -> armorRepository.addItem((Armor) item);
+            case CONSUMABLE -> consumableRepository.addItem((Consumable) item);
+            default -> throw new IllegalArgumentException("Unknown item type: " + item.getItemType());
         }
     }
 

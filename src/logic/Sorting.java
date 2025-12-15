@@ -7,7 +7,7 @@ import models.Weapon;
 import java.util.List;
 
 public class Sorting {
-    public static void sortByName(List<Item> arr) {
+    public void sortByName(List<Item> arr) {
         Item temp;
 
         for (int pass = 0; pass < arr.size() - 1; pass++) {
@@ -21,7 +21,7 @@ public class Sorting {
         }
     }
 
-    public static void sortById(List<Item> arr) {
+    public void sortById(List<Item> arr) {
         Item temp;
 
         for (int pass = 0; pass < arr.size() - 1; pass++) {
@@ -35,7 +35,7 @@ public class Sorting {
         }
     }
 
-    public static void sortByType(List<Item> arr) {
+    public void sortByType(List<Item> arr) {
         Item temp;
         for (int pass = 0; pass < arr.size() - 1; pass++) {
             for (int i = 0; i < arr.size() - 1 - pass; i++) {
@@ -50,7 +50,7 @@ public class Sorting {
 
     }
 
-    public static void sortByWeight(List<Item> arr) {
+    public void sortByWeight(List<Item> arr) {
         Item temp;
         for (int pass = 0; pass < arr.size() - 1; pass++) {
             for (int i = 0; i < arr.size() - 1 - pass; i++) {
@@ -63,7 +63,7 @@ public class Sorting {
         }
     }
 
-    public static void sortByCategory(List<Weapon> arr) {
+    public void sortByCategory(List<Weapon> arr) {
         Weapon temp;
         for (int pass = 0; pass < arr.size() - 1; pass++) {
             for (int i = 0; i < arr.size() - 1 - pass; i++) {
@@ -76,7 +76,7 @@ public class Sorting {
         }
     }
 
-    public static void sortByArmor(List<Armor> arr) {
+    public void sortByArmor(List<Armor> arr) {
         Armor temp;
         for (int pass = 0; pass < arr.size() - 1; pass++) {
             for (int i = 0; i < arr.size() - 1 - pass; i++) {
