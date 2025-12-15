@@ -1,30 +1,30 @@
 package models;
 
 import models.enums.ItemCategory;
-import models.enums.WeaponCategory;
 import models.enums.WeaponType;
+import models.enums.WeaponHandling;
 
 public class Weapon extends Item {
     private int damage;
     private double attackSpeed;
+    private WeaponHandling weaponHandling;
     private WeaponType weaponType;
-    private WeaponCategory weaponCategory;
 
-    public Weapon(int id, String name, double weight, int damage, double attackSpeed, WeaponType weaponType , ItemCategory category, WeaponCategory weaponCategory) {
+    public Weapon(int id, String name, double weight, int damage, double attackSpeed, WeaponHandling weaponHandling, ItemCategory category, WeaponType weaponType) {
         super(id, name, weight, category);
         this.damage = damage;
         this.attackSpeed = attackSpeed;
+        this.weaponHandling = weaponHandling;
         this.weaponType = weaponType;
-        this.weaponCategory = weaponCategory;
     }
 
     public Weapon(String name, double weight, int damage, double attackSpeed,
-                  WeaponType type, ItemCategory category, WeaponCategory weaponCategory) {
+                  WeaponHandling type, ItemCategory category, WeaponType weaponType) {
         super(name, weight, category);
         this.damage = damage;
         this.attackSpeed = attackSpeed;
-        this.weaponType = type;
-        this.weaponCategory = weaponCategory;
+        this.weaponHandling = type;
+        this.weaponType = weaponType;
     }
 
     public int getDamage() {
@@ -33,10 +33,10 @@ public class Weapon extends Item {
     public double getAttackSpeed() {
         return attackSpeed;
     }
-    public WeaponType getWeaponType() {
-        return weaponType;
+    public WeaponHandling getWeaponType() {
+        return weaponHandling;
     }
-    public WeaponCategory getWeaponCategory(){return weaponCategory;}
+    public WeaponType getWeaponCategory(){return weaponType;}
 
 
     @Override
@@ -49,6 +49,6 @@ public class Weapon extends Item {
         return super.toString() +
                 "Damage: " + damage +
                 ", Attack Speed: " + String.format("%.2f", attackSpeed) +
-                ", Weapon Type: " + weaponType;
+                ", Weapon Type: " + weaponHandling;
     }
 }

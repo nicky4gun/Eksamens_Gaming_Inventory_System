@@ -3,8 +3,8 @@ package dat;
 import dat.config.DatabaseConfig;
 import models.Weapon;
 import models.enums.ItemCategory;
-import models.enums.WeaponCategory;
 import models.enums.WeaponType;
+import models.enums.WeaponHandling;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ public class WeaponRepository {
 
     // CRUD operations for weapons
     public void addItem(Weapon weapon) {
-        String sql = "INSERT INTO weapon (name, weight, category, damage, attackSpeed, weaponType ,weaponCategory) VALUES (?, ?, ?, ?, ?, ?,?)";
+        String sql = "INSERT INTO weapon (name, weight, category, damage, attackSpeed, weaponHandling ,weaponType) VALUES (?, ?, ?, ?, ?, ?,?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -90,9 +90,9 @@ public class WeaponRepository {
 
     public List<Weapon> readAllWeapons() {
         List<Weapon> weapons = new ArrayList<>();
-        String sql = "SELECT weapon_id, name, weight, damage, attackSpeed, weaponType, category, weaponCategory FROM weapon";
+        String sql = "SELECT weapon_id, name, weight, damage, attackSpeed, weaponHandling, category, weaponType FROM weapon";
         String newSQL = """
-                SELECT i.id AS item_id, w.weapon_id, w.name, w.weight, w.damage, w.attackSpeed, w.weaponType, w.category, w.weaponCategory
+                SELECT i.id AS item_id, w.weapon_id, w.name, w.weight, w.damage, w.attackSpeed, w.weaponHandling, w.category, w.weaponType
                 FROM item i
                 JOIN weapon w ON i.weapon_id = w.weapon_id
                 """;
@@ -107,11 +107,11 @@ public class WeaponRepository {
                 double weight = rs.getDouble("weight");
                 int damage = rs.getInt("damage");
                 double attackSpeed = rs.getDouble("attackSpeed");
-                WeaponType weaponType = WeaponType.valueOf(rs.getString("weaponType"));
+                WeaponHandling weaponHandling = WeaponHandling.valueOf(rs.getString("weaponHandling"));
                 ItemCategory category =  ItemCategory.valueOf(rs.getString("category"));
-                WeaponCategory weaponCategory = WeaponCategory.valueOf(rs.getString("weaponCategory"));
+                WeaponType weaponType = WeaponType.valueOf(rs.getString("weaponType"));
 
-                Weapon weapon = new Weapon(itemId, name, weight, damage, attackSpeed, weaponType, category, weaponCategory);
+                Weapon weapon = new Weapon(itemId, name, weight, damage, attackSpeed, weaponHandling, category, weaponType);
                 weapons.add(weapon);
             }
 
@@ -122,8 +122,8 @@ public class WeaponRepository {
         return weapons;
     }
 
-    public void updateItem(String name, double weight, String category, int damage, double attackSpeed, boolean isOneHanded,String weaponCategory) {
-        String sql = "UPDATE weapon SET name = ?, weight = ?, category = ?, damage = ?, attackSpeed = ?, isOneHanded = ?,weaponCategory =? WHERE id = ?";
+    public void updateItem(String name, double weight, String category, int damage, double attackSpeed, boolean isOneHanded,String weaponType) {
+        String sql = "UPDATE weapon SET name = ?, weight = ?, category = ?, damage = ?, attackSpeed = ?, isOneHanded = ?,weaponType =? WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -134,7 +134,7 @@ public class WeaponRepository {
             stmt.setInt(4, damage);
             stmt.setDouble(5, attackSpeed);
             stmt.setBoolean(6,  isOneHanded);
-            stmt.setString(7, weaponCategory);
+            stmt.setString(7, weaponType);
 
             stmt.executeUpdate();
 

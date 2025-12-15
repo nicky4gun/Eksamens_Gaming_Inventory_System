@@ -1,10 +1,12 @@
 package dat;
 
 import logic.Sorting;
+import models.Armor;
+import models.Consumable;
 import models.Item;
+import models.Weapon;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class InventoryRepository {
@@ -28,12 +30,22 @@ public class InventoryRepository {
 
     }
 
+    public List<Weapon> findAllWeapons() {
+        return weaponRepository.readAllWeapons();
+    }
 
+    public List<Armor> findAllArmor() {
+        return armorRepository.readAllArmor();
+    }
+
+    public List<Consumable> findAllConsumables() {
+        return consumableRepository.readAllConsumables();
+    }
 
     // === Sorting ===
     public List<Item> findAllItemsSortedById() {
         List<Item> items = findAllItems();
-        items.sort(Comparator.comparing(Item::getId));
+        Sorting.sortById(items);
         return items;
     }
 
@@ -45,14 +57,27 @@ public class InventoryRepository {
 
     public List<Item> findAllItemsSortedByWeight() {
         List<Item> items = findAllItems();
-        items.sort(Comparator.comparing(Item::getWeight));
+        Sorting.sortByWeight(items);
         return items;
     }
 
     public List<Item> findAllItemsSortedByType() {
         List<Item> items = findAllItems();
-        items.sort(Comparator.comparing(Item::getItemType));
+        Sorting.sortByType(items);
         return items;
     }
+
+    public List<Weapon> findAllWeaponsSortedCategory(){
+        List<Weapon> weapons = findAllWeapons();
+        Sorting.sortByCategory(weapons);
+        return weapons;
+    }
+
+    public List<Armor> findAllArmorSortedCategory(){
+        List<Armor> armors = findAllArmor();
+        Sorting.sortByArmor(armors);
+      return armors;
+    }
+
 }
 

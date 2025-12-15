@@ -4,7 +4,6 @@ import dat.*;
 import models.*;
 import models.enums.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -118,16 +117,6 @@ public class InventoryService {
         }
     }
 
-    public List<Item> findAllItems() {
-        List<Item> items = inventoryRepository.findAllItems();
-
-        if (items.isEmpty()) {
-            System.out.println("Your Inventory is Empty!");
-        }
-
-        return items;
-    }
-
     // Item creation methods
     public Item createRandomItem() {
         int choice = 1 + rand.nextInt(3);
@@ -150,8 +139,8 @@ public class InventoryService {
         int damage = 5 + rand.nextInt(30);
         double attackSpeed = 0.5 + rand.nextDouble() * 2;
 
+        WeaponHandling weaponHandling = WeaponHandling.values()[rand.nextInt(WeaponHandling.values().length)];
         WeaponType weaponType = WeaponType.values()[rand.nextInt(WeaponType.values().length)];
-        WeaponCategory weaponCategory = WeaponCategory.values()[rand.nextInt(WeaponCategory.values().length)];
         CoolWeaponNames coolWeaponNames = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
         CoolWeaponNames coolWeaponNames2 = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
 
@@ -159,16 +148,16 @@ public class InventoryService {
         String weaponName;
 
         if (nameGen == 1) {
-            weaponName = weaponCategory + " " + coolWeaponNames;
+            weaponName = weaponType + " " + coolWeaponNames;
         }
         else if (nameGen == 2){
-            weaponName = coolWeaponNames + " " + weaponCategory;
+            weaponName = coolWeaponNames + " " + weaponType;
         }
         else {
-            weaponName = coolWeaponNames + " " + weaponCategory + " " + coolWeaponNames2;
+            weaponName = coolWeaponNames + " " + weaponType + " " + coolWeaponNames2;
         }
 
-        return new Weapon(weaponName, weight, damage, attackSpeed, weaponType, category, weaponCategory);
+        return new Weapon(weaponName, weight, damage, attackSpeed, weaponHandling, category, weaponType);
     }
 
     private Armor createRandomArmor() {
@@ -207,5 +196,54 @@ public class InventoryService {
 
         return new Consumable(consumableName, weight, category, health, cdamage, consumableCategory, stackable, quantity);
     }
+
+    // Searching
+    public List<Item> findAllItems() {
+        List<Item> items = inventoryRepository.findAllItems();
+
+        if (items.isEmpty()) {
+            System.out.println("Your Inventory is Empty!");
+        }
+
+        return items;
+    }
+
+    public List<Weapon> findAllWeapons() {
+        return inventoryRepository.findAllWeapons();
+    }
+
+    public List<Armor> findAllArmor() {
+        return inventoryRepository.findAllArmor();
+    }
+
+    public List<Consumable> findAllConsumables() {
+        return inventoryRepository.findAllConsumables();
+    }
+
+    // Sorting
+    public List<Item> findAllItemsBySortedByName() {
+        return inventoryRepository.findAllItemsSortedByName();
+    }
+
+    public List<Item> findAllItemsBySortedById() {
+        return inventoryRepository.findAllItemsSortedById();
+    }
+
+    public List<Item> findAllItemsBySortedByWeight() {
+        return inventoryRepository.findAllItemsSortedByWeight();
+    }
+
+    public List<Item> findAllItemsBySortedByType() {
+        return inventoryRepository.findAllItemsSortedByType();
+    }
+
+    public List<Weapon> findAllItemsBySortedByCategory() {
+        return inventoryRepository.findAllWeaponsSortedCategory();
+    }
+
+    public List<Armor> findAllItemsBySortedByDefense(){
+        return inventoryRepository.findAllArmorSortedCategory();
+    }
+
 }
 
