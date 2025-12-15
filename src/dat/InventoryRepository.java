@@ -1,5 +1,6 @@
 package dat;
 
+import logic.Sorting;
 import models.Item;
 
 import java.util.ArrayList;
@@ -24,7 +25,10 @@ public class InventoryRepository {
         items.addAll(armorRepository.readAllArmor());
         items.addAll(consumableRepository.readAllConsumables());
         return items;
+
     }
+
+
 
     // === Sorting ===
     public List<Item> findAllItemsSortedById() {
@@ -35,7 +39,7 @@ public class InventoryRepository {
 
     public List<Item> findAllItemsSortedByName() {
         List<Item> items = findAllItems();
-        items.sort(Comparator.comparing(Item::getName));
+        Sorting.sortByName(items);
         return items;
     }
 
@@ -51,3 +55,4 @@ public class InventoryRepository {
         return items;
     }
 }
+

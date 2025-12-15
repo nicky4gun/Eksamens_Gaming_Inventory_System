@@ -35,12 +35,13 @@ public class InventoryCliSystem {
 
         printInventoryStats(service);
 
+
         System.out.println(); // Print empty line
 
-        run(service, scanner);
+        run(service, scanner,inventoryRepository);
     }
 
-    public static void run(InventoryService service, Scanner scanner) {
+    public static void run(InventoryService service, Scanner scanner,InventoryRepository inventoryRepository) {
         printMenu();
         boolean running = true;
 
@@ -71,6 +72,9 @@ public class InventoryCliSystem {
                 case 4:
                     printInventory(service);
                     break;
+                case 5:
+                    printInventoryByName(inventoryRepository);
+                    break;
                 case 0:
                     System.out.println("Exiting Inventory...");
                     running = false;
@@ -94,6 +98,7 @@ public class InventoryCliSystem {
         System.out.println("2: Pick up Item");
         System.out.println("3: Remove item from Inventory");
         System.out.println("4: Show Inventory");
+        System.out.println("5: show inventory By name(boble)");
         System.out.println("0: Exit");
     }
 
@@ -101,6 +106,13 @@ public class InventoryCliSystem {
         List<Item> inventory = service.findAllItems();
 
         printInventoryStats(service);
+
+        for (Item item : inventory) {
+            System.out.println(item);
+        }
+    }
+    private static void printInventoryByName(InventoryRepository inventoryRepository) {
+        List<Item> inventory = inventoryRepository.findAllItemsSortedByName();
 
         for (Item item : inventory) {
             System.out.println(item);
