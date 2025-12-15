@@ -20,8 +20,9 @@ public class InventoryCliSystem {
         WeaponRepository weaponRepository = new WeaponRepository(config);
         ArmorRepository armorRepository = new ArmorRepository(config);
         ConsumableRepository consumableRepository = new ConsumableRepository(config);
+        InventoryRepository inventoryRepository = new InventoryRepository(weaponRepository, armorRepository, consumableRepository);
 
-        InventoryService service = new InventoryService(playerRepository, weaponRepository, armorRepository, consumableRepository);
+        InventoryService service = new InventoryService(playerRepository, weaponRepository, armorRepository, consumableRepository, inventoryRepository);
 
         Scanner scanner = new Scanner(System.in);
 

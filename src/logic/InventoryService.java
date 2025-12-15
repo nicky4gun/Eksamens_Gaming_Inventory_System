@@ -13,6 +13,7 @@ public class InventoryService {
     private final WeaponRepository weaponRepository;
     private final ArmorRepository armorRepository;
     private final ConsumableRepository consumableRepository;
+    private final InventoryRepository inventoryRepository;
 
     private final int MAX_WEIGHT = 50;
     private final int MAX_SLOTS =192;
@@ -20,11 +21,12 @@ public class InventoryService {
 
     private final Random rand = new Random();
 
-    public InventoryService(PlayerRepository playerRepository, WeaponRepository weaponRepository, ArmorRepository armorRepository, ConsumableRepository consumableRepository) {
+    public InventoryService(PlayerRepository playerRepository, WeaponRepository weaponRepository, ArmorRepository armorRepository, ConsumableRepository consumableRepository, InventoryRepository inventoryRepository) {
         this.playerRepository = playerRepository;
         this.weaponRepository = weaponRepository;
         this.armorRepository = armorRepository;
         this.consumableRepository = consumableRepository;
+        this.inventoryRepository = inventoryRepository;
     }
 
     // Game logic
@@ -117,11 +119,7 @@ public class InventoryService {
     }
 
     public List<Item> findAllItems() {
-        List<Item> items = new ArrayList<>();
-
-        items.addAll(weaponRepository.readAllWeapons());
-        items.addAll(armorRepository.readAllArmor());
-        items.addAll(consumableRepository.readAllConsumables());
+        List<Item> items = inventoryRepository.findAllItems();
 
         if (items.isEmpty()) {
             System.out.println("Your Inventory is Empty!");
