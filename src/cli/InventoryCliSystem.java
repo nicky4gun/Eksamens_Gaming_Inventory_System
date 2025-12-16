@@ -37,7 +37,6 @@ public class InventoryCliSystem {
 
         printInventoryStats(service);
 
-
         System.out.println(); // Print empty line
 
         run(service, scanner);
@@ -64,9 +63,8 @@ public class InventoryCliSystem {
                 case 1 -> handleCreatePlayer(service, scanner);
                 case 2 -> handlePickUpItem(service, scanner);
                 case 3 -> handleDeleteItem(service, scanner);
-                case 4 -> printInventoryById(service);
-                case 5 -> handleShowInventory(scanner, service);
-                case 6 -> handleSearchItem(service, scanner);
+                case 4 -> handleShowInventory(scanner, service);
+                case 5 -> handleSearchItem(service, scanner);
                 case 0 -> {System.out.println("Exiting Inventory..."); running = false;}
                 default -> System.out.println("Invalid choice. Try again!");
             }
@@ -87,8 +85,7 @@ public class InventoryCliSystem {
                 2. Pick up Item
                 3. Remove item from Inventory
                 4. Show Inventory
-                5. Show Inventory By name (Bubble)
-                6. search in inventory
+                5. Search in inventory
                 0. Exit program
                 """);
     }
@@ -284,12 +281,16 @@ public class InventoryCliSystem {
         System.out.println(succesfullyAdded + " item(s) added to inventory!");
     }
 
-    public static void handleShowInventory(Scanner scanner, InventoryService inventoryService) {
+    public static void handleShowInventory(Scanner scanner, InventoryService service) {
         printInventoryMenu();
+
+        System.out.println(); // Prints empty line
+
+        printInventoryById(service);
         boolean running = true;
 
         while (running) {
-            System.out.print("Choose Inventory sorting method: ");
+            System.out.print("\nChoose Inventory sorting method: ");
 
             int method = 0;
             try {
@@ -301,12 +302,12 @@ public class InventoryCliSystem {
             }
 
             switch (method) {
-                case 1 -> printInventoryByName(inventoryService);
-                case 2 -> printInventoryById(inventoryService);
-                case 3 -> printInventoryByWeight(inventoryService);
-                case 4 -> printInventoryByType(inventoryService);
-                case 5 -> printInventoryByWeaponCategory(inventoryService);
-                case 6 -> printInventoryByDefense(inventoryService);
+                case 1 -> printInventoryByName(service);
+                case 2 -> printInventoryById(service);
+                case 3 -> printInventoryByWeight(service);
+                case 4 -> printInventoryByType(service);
+                case 5 -> printInventoryByWeaponCategory(service);
+                case 6 -> printInventoryByDefense(service);
                 case 0 -> {System.out.println("Exiting Inventory..."); running = false;}
                 default -> System.out.println("Invalid choice. Try again!");
             }
@@ -314,7 +315,7 @@ public class InventoryCliSystem {
     }
 
     public static void handleSearchItem(InventoryService service, Scanner scanner) {
-        System.out.print("Shat item type would you like to search for?: ");
+        System.out.print("\nShat item type would you like to search for?: ");
         String search = scanner.nextLine().toLowerCase();
 
         switch (search) {

@@ -114,16 +114,12 @@ public class InventoryService {
     public Item createRandomItem() {
         int choice = 1 + rand.nextInt(3);
 
-        switch (choice) {
-            case 1:
-                return createRandomWeapon();
-            case 2:
-                return createRandomArmor();
-            case 3:
-                return createRandomConsumable();
-            default:
-                throw new IllegalArgumentException("Unexpected random value: " + choice);
-        }
+        return switch (choice) {
+            case 1 -> createRandomWeapon();
+            case 2 -> createRandomArmor();
+            case 3 -> createRandomConsumable();
+            default -> throw new IllegalArgumentException("Unexpected random value: " + choice);
+        };
     }
 
     private Weapon createRandomWeapon() {
@@ -202,40 +198,94 @@ public class InventoryService {
     }
 
     public List<Weapon> findAllWeapons() {
-        return inventoryRepository.findAllWeapons();
+        List<Weapon> items = inventoryRepository.findAllWeapons();
+
+        if (items.isEmpty()) {
+            System.out.println("You don't have any weapons");
+        }
+
+        return items;
     }
 
     public List<Armor> findAllArmor() {
-        return inventoryRepository.findAllArmor();
+        List<Armor> items = inventoryRepository.findAllArmor();
+
+        if (items.isEmpty()) {
+            System.out.println("You don't have any armor");
+        }
+
+        return items;
     }
 
     public List<Consumable> findAllConsumables() {
-        return inventoryRepository.findAllConsumables();
+        List<Consumable> items = inventoryRepository.findAllConsumables();
+
+        if (items.isEmpty()) {
+            System.out.println("You don't have any consumables");
+        }
+
+        return items;
     }
 
     // Sorting
     public List<Item> findAllItemsBySortedByName() {
-        return inventoryRepository.findAllItemsSortedByName();
+        List<Item> items = inventoryRepository.findAllItemsSortedByName();
+
+        if (items.isEmpty()) {
+            System.out.println("Your Inventory is Empty!");
+        }
+
+        return items;
     }
 
     public List<Item> findAllItemsBySortedById() {
-        return inventoryRepository.findAllItemsSortedById();
+        List<Item> items = inventoryRepository.findAllItemsSortedById();
+
+        if (items.isEmpty()) {
+            System.out.println("Your Inventory is Empty!");
+        }
+
+        return items;
     }
 
     public List<Item> findAllItemsBySortedByWeight() {
-        return inventoryRepository.findAllItemsSortedByWeight();
+        List<Item> items = inventoryRepository.findAllItemsSortedByWeight();
+
+        if (items.isEmpty()) {
+            System.out.println("Your Inventory is Empty!");
+        }
+
+        return items;
     }
 
     public List<Item> findAllItemsBySortedByType() {
-        return inventoryRepository.findAllItemsSortedByType();
+        List<Item> items = inventoryRepository.findAllItemsSortedByType();
+
+        if (items.isEmpty()) {
+            System.out.println("Your Inventory is Empty!");
+        }
+
+        return items;
     }
 
     public List<Weapon> findAllItemsBySortedByCategory() {
-        return inventoryRepository.findAllWeaponsSortedCategory();
+        List<Weapon> items = inventoryRepository.findAllWeaponsSortedCategory();
+
+        if (items.isEmpty()) {
+            System.out.println("You don't have any weapons. Unable to sort by category.");
+        }
+
+        return items;
     }
 
     public List<Armor> findAllItemsBySortedByDefense(){
-        return inventoryRepository.findAllArmorSortedCategory();
+        List<Armor> items = inventoryRepository.findAllArmorSortedCategory();
+
+        if (items.isEmpty()) {
+            System.out.println("You don't have any armor. Unable to sort by defense.");
+        }
+
+        return items;
     }
 
 }
