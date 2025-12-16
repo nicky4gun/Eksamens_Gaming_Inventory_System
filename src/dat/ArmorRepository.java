@@ -85,15 +85,14 @@ public class ArmorRepository {
 
     public List<Armor> readAllArmor() {
         List<Armor> armors = new ArrayList<>();
-        String sql = "SELECT armor_id, name, weight, category, defense  FROM armor";
-        String newSQL = """
+        String sql = """
                 SELECT i.id AS item_id, a.armor_id, a.name, a.weight, a.category, a.defense
                 FROM item i
                 JOIN armor a ON i.armor_id = a.armor_id
                 """;
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(newSQL);
+            PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {

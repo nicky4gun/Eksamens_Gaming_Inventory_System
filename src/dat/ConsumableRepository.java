@@ -91,15 +91,14 @@ public class ConsumableRepository {
 
     public List<Consumable> readAllConsumables() {
         List<Consumable> consumables = new ArrayList<>();
-        String sql = "SELECT consumable_id, name, weight, category, damage, health FROM consumable";
-        String newSQL = """
+        String sql = """
                 SELECT i.id AS item_id, c.consumable_id, c.name, c.weight, c.category, c.damage, c.health, c.consumableType, c.stack, c.quantity
                 FROM item i
                 JOIN consumable c ON i.consumable_id = c.consumable_id
                 """;
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(newSQL);
+            PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {

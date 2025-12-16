@@ -33,10 +33,11 @@ public class Weapon extends Item {
     public double getAttackSpeed() {
         return attackSpeed;
     }
-    public WeaponHandling getWeaponType() {
+    public WeaponHandling getWeaponHandling() {
         return weaponHandling;
     }
-    public WeaponType getWeaponCategory(){return weaponType;}
+    public WeaponType getWeaponType(){return weaponType;}
+
 
 
     @Override

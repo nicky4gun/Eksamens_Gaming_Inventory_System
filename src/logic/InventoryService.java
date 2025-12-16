@@ -16,7 +16,8 @@ public class InventoryService {
 
     private final int MAX_WEIGHT = 50;
     private final int MAX_SLOTS =192;
-    private int unlockedSlots = 32;
+    private int SLOT_COST = 30;
+    private int gold = 0;
 
     private final Random rand = new Random();
 
@@ -38,46 +39,63 @@ public class InventoryService {
 
     private void checkSlotsAvailable() {
         int usedSlots = getUsedSlotsFromDb();
-        if (usedSlots + 1 > unlockedSlots) {
+        if (usedSlots + 1 > getSlotsAvailable()) {
             throw new IllegalStateException("Can't add item: no free slots available");
         }
     }
 
-    // Ikke i brug endnu
     public void unlockSlots(int amount) {
-        unlockedSlots = Math.min(unlockedSlots + amount, MAX_SLOTS);
+        if (amount == 0) return;
+        int currentSlots = getSlotsAvailable();
+
+        if (currentSlots >= MAX_SLOTS) {
+            throw new IllegalStateException("Can't add item: no free slots available");
+        }
+
+        int slotsToAdd = Math.min(amount, MAX_SLOTS - currentSlots);
+        int totalCost = SLOT_COST * amount;
+
+        if (!spendGold(totalCost)) {
+            throw new IllegalStateException("Not enough gold to unlock slots");
+        }
+
+        addSlots(slotsToAdd);
     }
 
-    public double getTotalWeightFromDb() {
-        return weaponRepository.getTotalWeight()
-                + armorRepository.getTotalWeight()
-                + consumableRepository.getTotalWeight();
+    public void addGold(int amount) {
+        if (amount <= 0) return;
+
+        try {
+            playerRepository.addGold(amount);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add gold.");
+        }
+    }
+    public void addSlots (int slots ){
+        if (slots <= 0) return;
+        try{
+            playerRepository.addSlots(slots);
+        }catch (Exception e){
+            throw new RuntimeException("Failed to add slots.");
+        }
     }
 
-    public int getUsedSlotsFromDb() {
-        return weaponRepository.getItemCount()
-                + armorRepository.getItemCount()
-                + consumableRepository.getItemCount();
+
+    public boolean spendGold(int amount) {
+        if (amount <= 0) return false;
+
+        int currentGold = getGold();
+        if (currentGold < amount) return false;
+
+        try {
+            playerRepository.subtractGold(amount);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to subtract gold.");
+        }
     }
 
     // Create objects
-    public void createPlayer(String playerName, int credits, int level) {
-        if (playerName == null || playerName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Player name cannot be null or empty");
-        }
-
-        if (credits < 0) {
-            throw new IllegalArgumentException("Credits cannot be negative");
-        }
-
-        if (level < 1 || level > 100) {
-            throw new IllegalArgumentException("Level must be between 1 and 100");
-        }
-
-        Player player = new Player(playerName, credits, level);
-        playerRepository.addPlayer(player);
-    }
-
     public void addItem(Item item) {
         checkWeight(item);
         checkSlotsAvailable();
@@ -90,24 +108,30 @@ public class InventoryService {
         }
     }
 
-    public void deleteItemFromInventory(int id ) {
+    public void deleteItemFromInventory(int id) {
         if (id <= 0) {
             throw new IllegalArgumentException("Invalid item id: " + id);
         }
 
         boolean deleted = weaponRepository.deleteItemById(id);
+        gold += rand.nextInt(16)+5;
 
         if (!deleted) {
             armorRepository.deleteItemById(id);
+            gold += rand.nextInt(21)+5;
         }
 
         if (!deleted) {
             consumableRepository.deleteItemById(id);
+            gold += rand.nextInt(11)+5;
         }
 
         if (!deleted) {
             throw new IllegalArgumentException("Item with id " + id + " not found");
         }
+
+        addGold(gold);
+        System.out.println("You gained " + gold + " gold!");
     }
 
     // Item creation methods
@@ -132,6 +156,7 @@ public class InventoryService {
         WeaponType weaponType = WeaponType.values()[rand.nextInt(WeaponType.values().length)];
         CoolWeaponNames coolWeaponNames = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
         CoolWeaponNames coolWeaponNames2 = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
+        addGold(rand.nextInt(20) + 1);
 
         int nameGen = rand.nextInt(3) + 1;
         String weaponName;
@@ -157,6 +182,7 @@ public class InventoryService {
         String armorName = armorCategory.name() + " " + coolArmorNames;
 
         int defense = 1 + rand.nextInt(40);
+        addGold(rand.nextInt(20) + 1);
 
         return new Armor(armorName, weight, category, defense);
     }
@@ -174,6 +200,8 @@ public class InventoryService {
         boolean  stackable = false;
         int quantity = 0;
 
+        addGold(rand.nextInt(20) + 1);
+
         if (consumableCategory == ConsumableCategory.HEALTH_POTION) {
             health = 50;
         } else if (consumableCategory == ConsumableCategory.DAMAGE_POTION) {
@@ -187,16 +215,6 @@ public class InventoryService {
     }
 
     // Searching
-    public List<Item> findAllItems() {
-        List<Item> items = inventoryRepository.findAllItems();
-
-        if (items.isEmpty()) {
-            System.out.println("Your Inventory is Empty!");
-        }
-
-        return items;
-    }
-
     public List<Weapon> findAllWeapons() {
         List<Weapon> items = inventoryRepository.findAllWeapons();
 
@@ -288,5 +306,29 @@ public class InventoryService {
         return items;
     }
 
+    // Getters
+    public double getTotalWeightFromDb() {
+        return weaponRepository.getTotalWeight()
+                + armorRepository.getTotalWeight()
+                + consumableRepository.getTotalWeight();
+    }
+
+    public int getUsedSlotsFromDb() {
+        return weaponRepository.getItemCount()
+                + armorRepository.getItemCount()
+                + consumableRepository.getItemCount();
+    }
+
+    public int getGold() {
+        try {
+            return playerRepository.getGold();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get gold.");
+        }
+    }
+
+    public int getSlotsAvailable() {
+        return playerRepository.getSlots();
+    }
 }
 

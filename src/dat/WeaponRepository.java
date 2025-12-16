@@ -57,8 +57,8 @@ public class WeaponRepository {
             stmt.setString(3, weapon.getCategory().name());
             stmt.setInt(4, weapon.getDamage());
             stmt.setDouble(5, weapon.getAttackSpeed());
-            stmt.setString(6, weapon.getWeaponType().name());
-            stmt.setString(7,weapon.getWeaponCategory().name());
+            stmt.setString(6, weapon.getWeaponHandling().name());
+            stmt.setString(7, weapon.getWeaponType().name());
             stmt.executeUpdate();
 
             ResultSet keys = stmt.getGeneratedKeys();
@@ -90,15 +90,14 @@ public class WeaponRepository {
 
     public List<Weapon> readAllWeapons() {
         List<Weapon> weapons = new ArrayList<>();
-        String sql = "SELECT weapon_id, name, weight, damage, attackSpeed, weaponHandling, category, weaponType FROM weapon";
-        String newSQL = """
+        String sql = """
                 SELECT i.id AS item_id, w.weapon_id, w.name, w.weight, w.damage, w.attackSpeed, w.weaponHandling, w.category, w.weaponType
                 FROM item i
                 JOIN weapon w ON i.weapon_id = w.weapon_id
                 """;
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(newSQL);
+            PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {

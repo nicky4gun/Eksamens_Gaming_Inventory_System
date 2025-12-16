@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 public class InventoryCliSystem {
@@ -35,10 +36,11 @@ public class InventoryCliSystem {
             System.out.println("Connection failed: " + e.getMessage());
         }
 
+        System.out.println("=============================================");
+        System.out.println("Welcome to your Legend of CodeCraft inventory");
+        System.out.println("=============================================");
+
         printInventoryStats(service);
-
-        System.out.println(); // Print empty line
-
         run(service, scanner);
     }
 
@@ -60,11 +62,11 @@ public class InventoryCliSystem {
             }
 
             switch (method) {
-                case 1 -> handleCreatePlayer(service, scanner);
-                case 2 -> handlePickUpItem(service, scanner);
-                case 3 -> handleDeleteItem(service, scanner);
-                case 4 -> handleShowInventory(scanner, service);
-                case 5 -> handleSearchItem(service, scanner);
+                case 1 -> handlePickUpItem(service);
+                case 2 -> handleDeleteItem(service, scanner);
+                case 3 -> handleShowInventory(scanner, service);
+                case 4 -> handleSearchItem(service, scanner);
+                case 5 -> handleUnlockSlots(service, scanner);
                 case 0 -> {System.out.println("Exiting Inventory..."); running = false;}
                 default -> System.out.println("Invalid choice. Try again!");
             }
@@ -72,20 +74,21 @@ public class InventoryCliSystem {
     }
 
     private static void printInventoryStats(InventoryService service) {
-        // Shows player how much space is currently used in their inventory
         System.out.printf("Inventory (weight): %.2f kg%n", service.getTotalWeightFromDb());
         System.out.println("Slots used: " + service.getUsedSlotsFromDb());
+        System.out.println("Available Inventory Slots: " + service.getSlotsAvailable());
+        System.out.println("Collected gold: " + service.getGold());
     }
 
     private static void printMenu() {
         System.out.println("""
-                
+               
                 ==== Inventory Actions ====
                 1. Add new Player
-                2. Pick up Item
-                3. Remove item from Inventory
+                2. Collect Loot
+                3. Sell Items
                 4. Show Inventory
-                5. Search in inventory
+                5. Search in Inventory
                 0. Exit program
                 """);
     }
@@ -153,10 +156,10 @@ public class InventoryCliSystem {
     }
 
     private static void printWeapons(InventoryService service) {
-        List<Weapon> intventory = service.findAllWeapons();
+        List<Weapon> inventory = service.findAllWeapons();
 
-        for (Weapon wepon : intventory) {
-            System.out.println(wepon);
+        for (Weapon weapon : inventory) {
+            System.out.println(weapon);
         }
     }
 
@@ -177,40 +180,6 @@ public class InventoryCliSystem {
     }
 
     // Handlers for inventory actions
-    private static void handleCreatePlayer(InventoryService service, Scanner scanner) {
-        try {
-            System.out.print("Name: ");
-            String playerName = scanner.nextLine();
-
-            if (playerName == null || playerName.isBlank()) {
-                System.out.println("Name cannot be empty, Try again!");
-                return;
-            }
-
-            System.out.print("Credits: ");
-            int credits = scanner.nextInt();
-            scanner.nextLine();
-
-            System.out.print("Level: ");
-            int level = scanner.nextInt();
-            scanner.nextLine();
-
-            if (credits < 0 || level < 1 || level > 100) {
-                System.out.println("Invalid values. Unable to create Player.");
-                return;
-            }
-
-            service.createPlayer(playerName, credits, level);
-            System.out.println("Player added successfully!");
-
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid Input! Please enter a number.");
-            scanner.nextLine();
-        } catch (RuntimeException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-
     private static void handleDeleteItem(InventoryService service, Scanner scanner) {
         boolean running = true;
 
@@ -244,25 +213,13 @@ public class InventoryCliSystem {
         }
     }
 
-    private static void handlePickUpItem(InventoryService service, Scanner scanner) {
+    private static void handlePickUpItem(InventoryService service ) {
         System.out.print("Choose number of items to pick up: ");
+        Random random = new Random();
+        int numberOfItems = random.nextInt(5);
+        System.out.println("You found " +  numberOfItems + " items to pick up!");
 
-        int numberOfItems;
-        try {
-            numberOfItems = scanner.nextInt();
-            scanner.nextLine();
-
-            if (numberOfItems <= 0) {
-                System.out.println("Please enter a positive number.");
-                return;
-            }
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid input! Please enter a number.");
-            scanner.nextLine();
-            return;
-        }
-
-        int succesfullyAdded = 0;
+        int successfullyAdded = 0;
 
         for (int i = 0; i < numberOfItems; i++) {
 
@@ -271,18 +228,22 @@ public class InventoryCliSystem {
 
             try {
                 service.addItem(randomItem);
-                succesfullyAdded++;
+                successfullyAdded++;
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 break;
             }
         }
 
-        System.out.println(succesfullyAdded + " item(s) added to inventory!");
+        System.out.println(successfullyAdded + " item(s) added to inventory!");
     }
 
     public static void handleShowInventory(Scanner scanner, InventoryService service) {
         printInventoryMenu();
+
+        System.out.println(); // Prints empty line
+
+        printInventoryStats(service);
 
         System.out.println(); // Prints empty line
 
@@ -324,6 +285,17 @@ public class InventoryCliSystem {
             case "consumable" -> printConsumable(service);
             default -> System.out.println("Invalid choice. Try again!");
         }
+    }
+
+    public static void handleUnlockSlots(InventoryService service, Scanner scanner) {
+        System.out.print("How many slots would you like to unlock: ");
+        int slots = scanner.nextInt();
+        scanner.nextLine();
+
+        service.unlockSlots(slots);
+        int totalSlots = service.getSlotsAvailable();
+        System.out.println("Successfully unlocked: " + slots + " slots!");
+        System.out.println("You now have " + totalSlots + " unlocked slots.");
     }
 }
 

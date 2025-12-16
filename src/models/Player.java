@@ -2,12 +2,12 @@ package models;
 
 public class Player {
     private String playerName;
-    private int credits;
+    private int gold;
     private int level;
 
-    public Player(String playerName, int credits, int level) {
+    public Player(String playerName, int gold, int level) {
         this.playerName = playerName;
-        this.credits = credits;
+        this.gold = gold;
         this.level = level;
     }
 
@@ -15,8 +15,8 @@ public class Player {
         return playerName;
     }
 
-    public int getCredits() {
-        return credits;
+    public int getGold() {
+        return gold;
     }
 
     public int getLevel() {

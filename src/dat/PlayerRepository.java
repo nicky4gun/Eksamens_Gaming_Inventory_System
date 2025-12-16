@@ -12,69 +12,92 @@ public class PlayerRepository {
         this.config = config;
     }
 
-    // CRUD operations for players
-    public void addPlayer(Player player) {
-        String sql = "INSERT INTO info_player (name , credits, level) VALUES (?, ?, ?)";
-
-        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-
-            stmt.setString(1, player.getPlayerName());
-            stmt.setInt(2, player.getCredits());
-            stmt.setInt(3, player.getLevel());
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while trying to add player to database.");
-        }
-    }
-
-    public void readPlayer() {
-        String sql = "SELECT * FROM info_player";
+    // Operations for handling gold exchange
+    public int getGold() {
+        String sql = "SELECT gold FROM player WHERE id = 1";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                int credits = rs.getInt("credits");
-                int level = rs.getInt("level");
-                System.out.printf("%-3d | %-10s | %-10s | %-3d%n", id, name,  credits, level);
+            if (rs.next()) {
+                return rs.getInt("gold");
+            } else {
+                return 0;
             }
-
         } catch (SQLException e) {
-            throw new RuntimeException("an error occurred while trying to read player from database.");
+            throw new RuntimeException("Failed to read gold from database.", e);
         }
     }
 
-    public void updatePlayer(String name, int credits, int level) {
-        String sql = "UPDATE info_player SET name = ?, credits = ?, level ? WHERE id = ?";
+    public void addGold(int gold) {
+        if (gold <= 0) return;
+        String sql = "UPDATE player SET gold = gold + ? WHERE id = 1";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
 
-            stmt.setString(1, name);
-            stmt.setInt(2, credits);
-            stmt.setInt(3, level);
+            stmt.setInt(1, gold);
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while updating player in database.");
+            throw new RuntimeException("Failed to add gold.", e);
         }
     }
 
-    public void deletePlayer(int id) {
-        String sql = "DELETE FROM info_player WHERE id = ?";
+    public boolean subtractGold(int gold) {
+        if (gold <= 0) return false;
+        String sql = "UPDATE player SET gold = gold - ? WHERE id = 1";
+
+        int currentGold = getGold();
+        if (currentGold < gold) {
+            return false;
+        }
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, id);
+
+            stmt.setInt(1, gold);
+            stmt.executeUpdate();
+
+            return true;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to subtract gold.", e);
+        }
+    }
+
+    // Operations for handling slots in Inventory
+    public int getSlots() {
+        String sql = "SELECT slots FROM player WHERE id = 1";
+
+        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("slots");
+            } else {
+                return 32;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to read slots from database.", e);
+        }
+    }
+
+    public void addSlots(int slots) {
+        if (slots <= 0) return;
+        String sql = "UPDATE player SET slots = slots + ? WHERE id = 1";
+
+        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setInt(1, slots);
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while deleting player.");
+            throw new RuntimeException("Failed to add slots.", e);
         }
     }
+
 }

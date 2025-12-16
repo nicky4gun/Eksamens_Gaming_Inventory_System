@@ -5,6 +5,7 @@ import models.Armor;
 import models.Consumable;
 import models.Item;
 import models.Weapon;
+import models.enums.WeaponType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +81,21 @@ public class InventoryRepository {
         sort.sortByArmor(armors);
         return armors;
     }
+
+
+
+    //public List<Item> searchInventory(String query){
+    //        List<Item> items = findAllItems();
+    //        String LowerQuery = query.toLowerCase();
+    //
+    //        for (Item item : items) {
+    //            String itemName = item.getName().toLowerCase();
+    //            WeaponType weaponType = if (item instanceof Weapon) {
+    //                ((Item) Weapon).getWeaponType();
+    //            }
+    //
+    //        }
+    //    }
 
 }
 
