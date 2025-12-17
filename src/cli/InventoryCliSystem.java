@@ -23,7 +23,7 @@ public class InventoryCliSystem {
         ArmorRepository armorRepository = new ArmorRepository(config);
         ConsumableRepository consumableRepository = new ConsumableRepository(config);
         Sorting sort = new Sorting();
-        InventoryRepository inventoryRepository = new InventoryRepository(weaponRepository, armorRepository, consumableRepository,sort);
+        InventoryRepository inventoryRepository = new InventoryRepository(weaponRepository, armorRepository, consumableRepository, sort);
 
         InventoryService service = new InventoryService(playerRepository, weaponRepository, armorRepository, consumableRepository, inventoryRepository);
 
@@ -49,26 +49,26 @@ public class InventoryCliSystem {
         boolean running = true;
 
         while (running) {
-            System.out.print("Choose action: ");
-
-            int method;
             try {
-                method = scanner.nextInt();
+                System.out.print("Choose action: ");
+                int method = scanner.nextInt();
                 scanner.nextLine();
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input! Please enter a number.");
-                scanner.nextLine();
-                continue;
-            }
 
-            switch (method) {
-                case 1 -> handlePickUpItem(service);
-                case 2 -> handleDeleteItem(service, scanner);
-                case 3 -> handleShowInventory(scanner, service);
-                case 4 -> handleSearchItem(service, scanner);
-                case 5 -> handleUnlockSlots(service, scanner);
-                case 0 -> {System.out.println("Exiting Inventory..."); running = false;}
-                default -> System.out.println("Invalid choice. Try again!");
+                switch (method) {
+                    case 1 -> handleCollectLoot(service);
+                    case 2 -> handleDeleteItem(service, scanner);
+                    case 3 -> handleShowInventory(scanner, service);
+                    case 4 -> handleSearchItem(service, scanner);
+                    case 5 -> handleUnlockSlots(service, scanner);
+                    case 0 -> {
+                        System.out.println("Exiting Inventory...");
+                        running = false;
+                    }
+                    default -> System.out.println("Invalid choice. Try again!");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid Input! Please enter a number.");
+                scanner.nextLine();
             }
         }
     }
@@ -84,11 +84,11 @@ public class InventoryCliSystem {
         System.out.println("""
                
                 ==== Inventory Actions ====
-                1. Add new Player
-                2. Collect Loot
-                3. Sell Items
-                4. Show Inventory
-                5. Search in Inventory
+                1. Collect Loot
+                2. Sell Items
+                3. Show Inventory
+                4. Search in Inventory
+                5. Unlock Additional Slots
                 0. Exit program
                 """);
     }
@@ -181,39 +181,38 @@ public class InventoryCliSystem {
 
     // Handlers for inventory actions
     private static void handleDeleteItem(InventoryService service, Scanner scanner) {
+        printInventoryById(service);
         boolean running = true;
 
         while (running) {
-            System.out.print("Enter item to delete (id) - (0 to exit): ");
-
-            int id;
             try {
-                id = scanner.nextInt();
+                System.out.print("Enter item to delete (id) - (0 to exit): ");
+                int id = scanner.nextInt();
                 scanner.nextLine();
+
+
+                if (id < 0) {
+                    System.out.println("Not a valid id. Try again!");
+                } else if (id == 0) {
+                    printInventoryStats(service);
+                    System.out.println("\nExiting delete-mode...");
+                    running = false;
+                } else {
+                    service.deleteItemFromInventory(id);
+                    System.out.println("Item deleted successfully!");
+                }
+
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input! Please enter a number.");
                 scanner.nextLine();
-                continue;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
             }
 
-            if (id < 0) {
-                System.out.println("Not a valid id. Try again!");
-            } else if (id == 0) {
-                printInventoryStats(service);
-                System.out.println("\nExiting delete-mode...");
-                running = false;
-            } else {
-                try {
-                    service.deleteItemFromInventory(id);
-                    System.out.println("Item deleted successfully!");
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Error: " + e.getMessage());
-                }
-            }
         }
     }
 
-    private static void handlePickUpItem(InventoryService service ) {
+    private static void handleCollectLoot(InventoryService service) {
         System.out.print("Choose number of items to pick up: ");
         Random random = new Random();
         int numberOfItems = random.nextInt(5);
@@ -240,9 +239,6 @@ public class InventoryCliSystem {
 
     public static void handleShowInventory(Scanner scanner, InventoryService service) {
         printInventoryMenu();
-
-        System.out.println(); // Prints empty line
-
         printInventoryStats(service);
 
         System.out.println(); // Prints empty line
@@ -251,53 +247,59 @@ public class InventoryCliSystem {
         boolean running = true;
 
         while (running) {
-            System.out.print("\nChoose Inventory sorting method: ");
-
-            int method = 0;
             try {
-                method = scanner.nextInt();
+                System.out.print("\nChoose Inventory sorting method: ");
+
+                int method = scanner.nextInt();
                 scanner.nextLine();
+
+
+                switch (method) {
+                    case 1 -> printInventoryByName(service);
+                    case 2 -> printInventoryById(service);
+                    case 3 -> printInventoryByWeight(service);
+                    case 4 -> printInventoryByType(service);
+                    case 5 -> printInventoryByWeaponCategory(service);
+                    case 6 -> printInventoryByDefense(service);
+                    case 0 -> {
+                        System.out.println("Exiting Show Inventory...");
+                        running = false;
+                    }
+                    default -> System.out.println("Invalid choice. Try again!");
+                }
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input! Please enter a number.");
-                scanner.nextLine();
-            }
-
-            switch (method) {
-                case 1 -> printInventoryByName(service);
-                case 2 -> printInventoryById(service);
-                case 3 -> printInventoryByWeight(service);
-                case 4 -> printInventoryByType(service);
-                case 5 -> printInventoryByWeaponCategory(service);
-                case 6 -> printInventoryByDefense(service);
-                case 0 -> {System.out.println("Exiting Inventory..."); running = false;}
-                default -> System.out.println("Invalid choice. Try again!");
             }
         }
     }
 
     public static void handleSearchItem(InventoryService service, Scanner scanner) {
-        System.out.print("\nShat item type would you like to search for?: ");
+        System.out.print("\nEnter type of item to search: ");
         String search = scanner.nextLine().toLowerCase();
 
         switch (search) {
             case "weapon" -> printWeapons(service);
             case "armor" -> printArmor(service);
             case "consumable" -> printConsumable(service);
-            default -> System.out.println("Invalid choice. Try again!");
+            default -> System.out.println("Category does not exist. Try again!");
         }
     }
 
     public static void handleUnlockSlots(InventoryService service, Scanner scanner) {
-        System.out.print("How many slots would you like to unlock: ");
-        int slots = scanner.nextInt();
-        scanner.nextLine();
+        try {
+            System.out.print("How many slots would you like to unlock?: ");
+            int slots = scanner.nextInt();
+            scanner.nextLine();
 
-        service.unlockSlots(slots);
-        int totalSlots = service.getSlotsAvailable();
-        System.out.println("Successfully unlocked: " + slots + " slots!");
-        System.out.println("You now have " + totalSlots + " unlocked slots.");
+            service.unlockSlots(slots);
+            int totalSlots = service.getSlotsAvailable();
+            System.out.println("Successfully unlocked: " + slots + " slots!");
+            System.out.println("You now have " + totalSlots + " unlocked slots.");
+
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input! Please enter a number.");
+        } catch (IllegalStateException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }
-
-
-

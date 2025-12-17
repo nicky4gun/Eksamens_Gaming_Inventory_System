@@ -16,40 +16,14 @@ public class ConsumableRepository {
         this.config = config;
     }
 
-    public double getTotalWeight() {
-        String sql = "SELECT COALESCE(SUM(weight), 0) FROM consumable";
-
-        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())){
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next() ? rs.getDouble(1) : 0;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error: Unable calculate total weight", e);
-        }
-    }
-
-    public int getItemCount() {
-        String sql = "SELECT COUNT(*) FROM consumable";
-
-        try(Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next() ? rs.getInt(1) : 0;
-
-        } catch(SQLException e){
-            throw new RuntimeException("Error: Unable calculate total amount of items", e);
-        }
-    }
-
     // CRUD operations for consumables
     public void addItem(Consumable consumable) {
         String sql = "INSERT INTO consumable (name, weight, category, health, damage, consumableType, stack, quantity) VALUES (?, ?, ?, ?, ?, ?,? , ?)";
+        String sqlItem = "INSERT INTO item (consumable_id) VALUES (?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement itemStmt = conn.prepareStatement(sqlItem, Statement.RETURN_GENERATED_KEYS);
 
             stmt.setString(1, consumable.getName());
             stmt.setDouble(2, consumable.getWeight());
@@ -68,20 +42,13 @@ public class ConsumableRepository {
                 consumable.setId(consumableId);
             }
 
-            String sqlItem = "INSERT INTO item (consumable_id) VALUES (?)";
+            itemStmt.setInt(1, consumable.getId());
+            itemStmt.executeUpdate();
 
-            try {
-                PreparedStatement itemStmt = conn.prepareStatement(sqlItem, Statement.RETURN_GENERATED_KEYS);
-                itemStmt.setInt(1, consumable.getId());
-                itemStmt.executeUpdate();
-
-                ResultSet itemKeys = itemStmt.getGeneratedKeys();
-                if (itemKeys.next()) {
-                    int itemId = itemKeys.getInt(1);
-                    consumable.setId(itemId);
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException("Error: Unable to insert item");
+            ResultSet itemKeys = itemStmt.getGeneratedKeys();
+            if (itemKeys.next()) {
+                int itemId = itemKeys.getInt(1);
+                consumable.setId(itemId);
             }
 
         } catch (SQLException e) {
@@ -120,25 +87,6 @@ public class ConsumableRepository {
         }
 
         return consumables;
-    }
-
-    public void updateItem(String name, double weight, String category, int damage, int health) {
-        String sql = "UPDATE consumable  SET name = ?, weight = ?, category = ?, damage = ?, health = ? WHERE id = ?";
-
-        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-
-            stmt.setString(1, name);
-            stmt.setDouble(2, weight);
-            stmt.setString(3, category);
-            stmt.setInt(4, damage);
-            stmt.setInt(5, health);
-
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while updating item.", e);
-        }
     }
 
     public boolean deleteItemById(int id) {

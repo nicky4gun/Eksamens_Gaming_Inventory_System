@@ -16,7 +16,7 @@ public class InventoryService {
 
     private final int MAX_WEIGHT = 50;
     private final int MAX_SLOTS =192;
-    private int SLOT_COST = 30;
+    private final int SLOT_COST = 30;
     private int gold = 0;
 
     private final Random rand = new Random();
@@ -34,7 +34,7 @@ public class InventoryService {
         double totalWeight = getTotalWeightFromDb();
         if (totalWeight + item.getWeight() > MAX_WEIGHT) {
             throw new IllegalStateException("Can't add item: inventory exceeds max weight of " + MAX_WEIGHT);
-        };
+        }
     }
 
     private void checkSlotsAvailable() {
@@ -71,6 +71,7 @@ public class InventoryService {
             throw new RuntimeException("Failed to add gold.");
         }
     }
+
     public void addSlots (int slots ){
         if (slots <= 0) return;
         try{
@@ -113,23 +114,15 @@ public class InventoryService {
             throw new IllegalArgumentException("Invalid item id: " + id);
         }
 
-        boolean deleted = weaponRepository.deleteItemById(id);
-        gold += rand.nextInt(16)+5;
-
-        if (!deleted) {
-            armorRepository.deleteItemById(id);
-            gold += rand.nextInt(21)+5;
-        }
-
-        if (!deleted) {
-            consumableRepository.deleteItemById(id);
-            gold += rand.nextInt(11)+5;
-        }
+        boolean deleted = weaponRepository.deleteItemById(id) ||
+                armorRepository.deleteItemById(id) ||
+                consumableRepository.deleteItemById(id);
 
         if (!deleted) {
             throw new IllegalArgumentException("Item with id " + id + " not found");
         }
 
+        gold += rand.nextInt(16)+5;
         addGold(gold);
         System.out.println("You gained " + gold + " gold!");
     }
@@ -196,7 +189,7 @@ public class InventoryService {
 
         double weight = 0.5;
         int health = 0;
-        int cdamage = 0;
+        int damage = 0;
         boolean  stackable = false;
         int quantity = 0;
 
@@ -205,13 +198,13 @@ public class InventoryService {
         if (consumableCategory == ConsumableCategory.HEALTH_POTION) {
             health = 50;
         } else if (consumableCategory == ConsumableCategory.DAMAGE_POTION) {
-            cdamage = 20;
+            damage = 20;
         } else if (consumableCategory == ConsumableCategory.ARROWS || consumableCategory == ConsumableCategory.BOLTS ) {
             stackable = true;
             quantity = 12;
         }
 
-        return new Consumable(consumableName, weight, category, health, cdamage, consumableCategory, stackable, quantity);
+        return new Consumable(consumableName, weight, category, health, damage, consumableCategory, stackable, quantity);
     }
 
     // Searching
@@ -308,15 +301,25 @@ public class InventoryService {
 
     // Getters
     public double getTotalWeightFromDb() {
-        return weaponRepository.getTotalWeight()
-                + armorRepository.getTotalWeight()
-                + consumableRepository.getTotalWeight();
+        List<Item> items = inventoryRepository.findAllItems();
+        double totalWeight = 0.0;
+
+        for (Item item : items) {
+            totalWeight += item.getWeight();
+        }
+
+        return totalWeight;
     }
 
     public int getUsedSlotsFromDb() {
-        return weaponRepository.getItemCount()
-                + armorRepository.getItemCount()
-                + consumableRepository.getItemCount();
+        List<Item> items = inventoryRepository.findAllItems();
+        int counter = 0;
+
+        for (int i = 0; i < items.size(); i++) {
+            counter++;
+        }
+
+        return counter;
     }
 
     public int getGold() {
@@ -328,7 +331,6 @@ public class InventoryService {
     }
 
     public int getSlotsAvailable() {
-        return playerRepository.getSlots();
+        return playerRepository.getSlots() - getUsedSlotsFromDb();
     }
 }
-

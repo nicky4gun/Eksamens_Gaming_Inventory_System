@@ -15,40 +15,14 @@ public class ArmorRepository {
         this.config = config;
     }
 
-    public double getTotalWeight() {
-        String sql = "SELECT COALESCE(SUM(weight), 0) FROM armor";
-
-        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())){
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next() ? rs.getDouble(1) : 0;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error: Unable calculate total weight");
-        }
-    }
-
-    public int getItemCount() {
-        String sql = "SELECT COUNT(*) FROM armor";
-
-        try(Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next() ? rs.getInt(1) : 0;
-
-        } catch(SQLException e){
-            throw new RuntimeException("Error: Unable calculate total amount of items");
-        }
-    }
-
     // CRUD operations for armor
     public void addItem( Armor armor) {
         String sql = "INSERT INTO armor (name, weight, defense, category) VALUES (?, ?, ?, ?)";
+        String sqlItem = "INSERT INTO item (armor_id) VALUES (?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement itemStmt = conn.prepareStatement(sqlItem, Statement.RETURN_GENERATED_KEYS);
 
             stmt.setString(1,armor.getName());
             stmt.setDouble(2, armor.getWeight());
@@ -56,26 +30,19 @@ public class ArmorRepository {
             stmt.setString(4, armor.getCategory().name());
             stmt.executeUpdate();
 
-            ResultSet keys = stmt.getGeneratedKeys();
-            if (keys.next()) {
-                int armorId = keys.getInt(1);
+            ResultSet armorKeys = stmt.getGeneratedKeys();
+            if (armorKeys.next()) {
+                int armorId = armorKeys.getInt(1);
                 armor.setId(armorId);
             }
 
-            String sqlItem = "INSERT INTO item (armor_id) VALUES (?)";
+            itemStmt.setInt(1, armor.getId());
+            itemStmt.executeUpdate();
 
-            try {
-                PreparedStatement itemStmt = conn.prepareStatement(sqlItem, Statement.RETURN_GENERATED_KEYS);
-                itemStmt.setInt(1, armor.getId());
-                itemStmt.executeUpdate();
-
-                ResultSet itemKeys = itemStmt.getGeneratedKeys();
-                if (itemKeys.next()) {
-                    int itemId = itemKeys.getInt(1);
-                    armor.setId(itemId);
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException("Error: Unable to insert item");
+            ResultSet itemKeys = itemStmt.getGeneratedKeys();
+            if (itemKeys.next()) {
+                int itemId = itemKeys.getInt(1);
+                armor.setId(itemId);
             }
 
         } catch (SQLException e) {
@@ -111,25 +78,6 @@ public class ArmorRepository {
         }
 
         return armors;
-    }
-
-    public void updateItem(String name,  double weight, String category,  int defense) {
-        String sql = "UPDATE armor  SET name = ?, weight = ?, category = ?, , defense = ?, WHERE id = ?";
-
-        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-
-            stmt.setString(1, name);
-            stmt.setDouble(2, weight);
-            stmt.setString(3, category);
-            stmt.setInt(4, defense);
-
-
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while updating item.", e);
-        }
     }
 
     public boolean deleteItemById(int id) {

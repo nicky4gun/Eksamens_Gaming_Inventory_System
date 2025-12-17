@@ -17,40 +17,14 @@ public class WeaponRepository {
         this.config = config;
     }
 
-    public double getTotalWeight() {
-        String sql = "SELECT COALESCE(SUM(weight), 0) FROM weapon";
-
-        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())){
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next() ? rs.getDouble(1) : 0;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error: Unable calculate total weight");
-        }
-    }
-
-    public int getItemCount() {
-        String sql = "SELECT COUNT(*) FROM weapon";
-
-        try(Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next() ? rs.getInt(1) : 0;
-
-        } catch(SQLException e){
-            throw new RuntimeException("Error: Unable calculate total amount of items");
-        }
-    }
-
     // CRUD operations for weapons
     public void addItem(Weapon weapon) {
         String sql = "INSERT INTO weapon (name, weight, category, damage, attackSpeed, weaponHandling ,weaponType) VALUES (?, ?, ?, ?, ?, ?,?)";
+        String sqlItem = "INSERT INTO item (weapon_id) VALUES (?)";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement itemStmt = conn.prepareStatement(sqlItem, Statement.RETURN_GENERATED_KEYS);
 
             stmt.setString(1, weapon.getName());
             stmt.setDouble(2, weapon.getWeight());
@@ -61,26 +35,19 @@ public class WeaponRepository {
             stmt.setString(7, weapon.getWeaponType().name());
             stmt.executeUpdate();
 
-            ResultSet keys = stmt.getGeneratedKeys();
-            if (keys.next()) {
-                int weaponId = keys.getInt(1);
+            ResultSet weaponKeys = stmt.getGeneratedKeys();
+            if (weaponKeys.next()) {
+                int weaponId = weaponKeys.getInt(1);
                 weapon.setId(weaponId);
             }
 
-            String sqlItem = "INSERT INTO item (weapon_id) VALUES (?)";
+            itemStmt.setInt(1, weapon.getId());
+            itemStmt.executeUpdate();
 
-            try {
-                PreparedStatement itemStmt = conn.prepareStatement(sqlItem, Statement.RETURN_GENERATED_KEYS);
-                itemStmt.setInt(1, weapon.getId());
-                itemStmt.executeUpdate();
-
-                ResultSet itemKeys = itemStmt.getGeneratedKeys();
-                if (itemKeys.next()) {
-                    int itemId = itemKeys.getInt(1);
-                    weapon.setId(itemId);
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException("Error: Unable to insert item");
+            ResultSet itemKeys = itemStmt.getGeneratedKeys();
+            if (itemKeys.next()) {
+                int itemId = itemKeys.getInt(1);
+                weapon.setId(itemId);
             }
 
         } catch (SQLException e) {
@@ -119,27 +86,6 @@ public class WeaponRepository {
         }
 
         return weapons;
-    }
-
-    public void updateItem(String name, double weight, String category, int damage, double attackSpeed, boolean isOneHanded,String weaponType) {
-        String sql = "UPDATE weapon SET name = ?, weight = ?, category = ?, damage = ?, attackSpeed = ?, isOneHanded = ?,weaponType =? WHERE id = ?";
-
-        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-
-            stmt.setString(1, name);
-            stmt.setDouble(2, weight);
-            stmt.setString(3, category);
-            stmt.setInt(4, damage);
-            stmt.setDouble(5, attackSpeed);
-            stmt.setBoolean(6,  isOneHanded);
-            stmt.setString(7, weaponType);
-
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while updating item.", e);
-        }
     }
 
     public boolean deleteItemById(int id) {
