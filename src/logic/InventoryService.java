@@ -64,36 +64,17 @@ public class InventoryService {
 
     public void addGold(int amount) {
         if (amount <= 0) return;
-
-        try {
-            playerRepository.addGold(amount);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to add gold.");
-        }
+        playerRepository.addGold(amount);
     }
 
     public void addSlots (int slots ){
         if (slots <= 0) return;
-        try{
-            playerRepository.addSlots(slots);
-        }catch (Exception e){
-            throw new RuntimeException("Failed to add slots.");
-        }
+        playerRepository.addSlots(slots);
     }
-
 
     public boolean spendGold(int amount) {
         if (amount <= 0) return false;
-
-        int currentGold = getGold();
-        if (currentGold < amount) return false;
-
-        try {
-            playerRepository.subtractGold(amount);
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to subtract gold.");
-        }
+        return playerRepository.subtractGold(amount);
     }
 
     // Create objects
@@ -156,11 +137,9 @@ public class InventoryService {
 
         if (nameGen == 1) {
             weaponName = weaponType + " " + coolWeaponNames;
-        }
-        else if (nameGen == 2){
+        } else if (nameGen == 2){
             weaponName = coolWeaponNames + " " + weaponType;
-        }
-        else {
+        } else {
             weaponName = coolWeaponNames + " " + weaponType + " " + coolWeaponNames2;
         }
 
@@ -190,7 +169,7 @@ public class InventoryService {
         double weight = 0.5;
         int health = 0;
         int damage = 0;
-        boolean  stackable = false;
+        boolean stackable = false;
         int quantity = 0;
 
         addGold(rand.nextInt(20) + 1);
@@ -323,11 +302,7 @@ public class InventoryService {
     }
 
     public int getGold() {
-        try {
-            return playerRepository.getGold();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get gold.");
-        }
+        return playerRepository.getGold();
     }
 
     public int getSlotsAvailable() {

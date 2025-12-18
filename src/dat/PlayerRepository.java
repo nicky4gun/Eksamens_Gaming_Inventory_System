@@ -47,20 +47,15 @@ public class PlayerRepository {
 
     public boolean subtractGold(int gold) {
         if (gold <= 0) return false;
-        String sql = "UPDATE player SET gold = gold - ? WHERE id = 1";
-
-        int currentGold = getGold();
-        if (currentGold < gold) {
-            return false;
-        }
+        String sql = "UPDATE player SET gold = gold - ? WHERE id = 1 AND gold >= ?";
 
         try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             stmt.setInt(1, gold);
-            stmt.executeUpdate();
-
-            return true;
+            stmt.setInt(2, gold);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
 
         } catch (SQLException e) {
             throw new RuntimeException("Failed to subtract gold.", e);
