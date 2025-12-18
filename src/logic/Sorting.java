@@ -5,7 +5,10 @@ import models.Item;
 import models.Weapon;
 
 import java.util.List;
-
+ /**Bubble works by picking the first number/word and looking at the number/word next to the first number/word
+* if the  number/word it has is  higher than the other they swap places this keeps on until it finds a higher number or there are no other number higher that it has
+* if it finds a higher number it takes the higher one  and keep going form this new number  when the number hits the end its locks the number in place, and it now only need to go to the end -1 this keeps on going until its sorted.
+**/
 public class Sorting {
     public void sortByName(List<Item> arr) {
         Item temp;

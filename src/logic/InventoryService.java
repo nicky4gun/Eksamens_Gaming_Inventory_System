@@ -67,7 +67,7 @@ public class InventoryService {
         playerRepository.addGold(amount);
     }
 
-    public void addSlots (int slots ){
+    public void addSlots(int slots ){
         if (slots <= 0) return;
         playerRepository.addSlots(slots);
     }

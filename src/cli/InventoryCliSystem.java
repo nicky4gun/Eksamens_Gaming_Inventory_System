@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class InventoryCliSystem {
     public static void main(String[] args) {
         DatabaseConfig config = new DatabaseConfig();
-
+        //presetting of all object
         PlayerRepository playerRepository = new PlayerRepository(config);
         WeaponRepository weaponRepository = new WeaponRepository(config);
         ArmorRepository armorRepository = new ArmorRepository(config);
@@ -241,9 +241,7 @@ public class InventoryCliSystem {
         printInventoryMenu();
         printInventoryStats(service);
 
-        System.out.println(); // Prints empty line
 
-        printInventoryById(service);
         boolean running = true;
 
         while (running) {
@@ -252,7 +250,6 @@ public class InventoryCliSystem {
 
                 int method = scanner.nextInt();
                 scanner.nextLine();
-
 
                 switch (method) {
                     case 1 -> printInventoryByName(service);
@@ -274,7 +271,7 @@ public class InventoryCliSystem {
     }
 
     public static void handleSearchItem(InventoryService service, Scanner scanner) {
-        System.out.print("\nEnter type of item to search: ");
+        System.out.print("\nEnter type of item to search (weapon,armor,consumable): ");
         String search = scanner.nextLine().toLowerCase();
 
         switch (search) {

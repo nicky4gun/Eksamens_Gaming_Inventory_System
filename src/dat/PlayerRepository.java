@@ -1,7 +1,6 @@
 package dat;
 
 import dat.config.DatabaseConfig;
-import models.Player;
 
 import java.sql.*;
 
@@ -12,7 +11,8 @@ public class PlayerRepository {
         this.config = config;
     }
 
-    // Operations for handling gold exchange
+
+    // Takes the gold form the corresponded column for the player at showcase it
     public int getGold() {
         String sql = "SELECT gold FROM player WHERE id = 1";
 
@@ -30,6 +30,7 @@ public class PlayerRepository {
         }
     }
 
+    // Give gold based on weapon sold or adventuring and put in the correspondent table column for the player
     public void addGold(int gold) {
         if (gold <= 0) return;
         String sql = "UPDATE player SET gold = gold + ? WHERE id = 1";
@@ -45,6 +46,7 @@ public class PlayerRepository {
         }
     }
 
+       //  remove gold when used fx slots
     public boolean subtractGold(int gold) {
         if (gold <= 0) return false;
         String sql = "UPDATE player SET gold = gold - ? WHERE id = 1 AND gold >= ?";
@@ -80,6 +82,7 @@ public class PlayerRepository {
         }
     }
 
+    // Add more slots to the player when he buys them
     public void addSlots(int slots) {
         if (slots <= 0) return;
         String sql = "UPDATE player SET slots = slots + ? WHERE id = 1";
