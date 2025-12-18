@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class InventoryCliSystem {
     public static void main(String[] args) {
         DatabaseConfig config = new DatabaseConfig();
-        //presetting of all object
+        // Presetting of all object
         PlayerRepository playerRepository = new PlayerRepository(config);
         WeaponRepository weaponRepository = new WeaponRepository(config);
         ArmorRepository armorRepository = new ArmorRepository(config);
@@ -240,14 +240,11 @@ public class InventoryCliSystem {
     public static void handleShowInventory(Scanner scanner, InventoryService service) {
         printInventoryMenu();
         printInventoryStats(service);
-
-
         boolean running = true;
 
         while (running) {
             try {
                 System.out.print("\nChoose Inventory sorting method: ");
-
                 int method = scanner.nextInt();
                 scanner.nextLine();
 

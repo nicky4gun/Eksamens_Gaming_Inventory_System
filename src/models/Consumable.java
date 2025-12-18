@@ -29,10 +29,6 @@ public class Consumable extends Item {
         this.quantity = quantity;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
     public int getHealth() {
         return health;
     }

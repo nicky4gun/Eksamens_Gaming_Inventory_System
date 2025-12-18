@@ -46,7 +46,7 @@ public class PlayerRepository {
         }
     }
 
-       //  remove gold when used fx slots
+    // Removes gold when used e.g. slots
     public boolean subtractGold(int gold) {
         if (gold <= 0) return false;
         String sql = "UPDATE player SET gold = gold - ? WHERE id = 1 AND gold >= ?";
@@ -97,5 +97,4 @@ public class PlayerRepository {
             throw new RuntimeException("Failed to add slots.", e);
         }
     }
-
 }

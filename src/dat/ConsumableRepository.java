@@ -78,6 +78,7 @@ public class ConsumableRepository {
                 ConsumableCategory consumableType = ConsumableCategory.valueOf(rs.getString("consumableType"));
                 boolean stackable = rs.getBoolean("stack");
                 int quantity = rs.getInt("quantity");
+
                 Consumable consumable = new Consumable(itemId, name, weight, category, damage, health, consumableType, stackable, quantity);
                 consumables.add(consumable);
             }
