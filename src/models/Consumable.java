@@ -45,11 +45,15 @@ public class Consumable extends Item {
         return quantity;
     }
 
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
     @Override
     public ItemCategory getItemType() {return ItemCategory.CONSUMABLE;}
 
     @Override
     public String toString() {
-        return super.toString()  + " Damage: " + damage + ", Health: " + health + " Category: " + consumableCategory + " stack: " + stackable + " quantity: " + quantity ;
+        return super.toString()  + " Damage: " + damage + ", Health: " + health + ", Category: " + consumableCategory + ", stack: " + stackable + ", quantity: " + quantity ;
     }
 }

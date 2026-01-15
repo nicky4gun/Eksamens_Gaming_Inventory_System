@@ -1,21 +1,28 @@
 package dat;
 
+import dat.config.DatabaseConfig;
 import logic.Sorting;
 import models.Armor;
 import models.Consumable;
 import models.Item;
 import models.Weapon;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class InventoryRepository {
+    private final DatabaseConfig config;
     private final WeaponRepository weaponRepository;
     private final ArmorRepository armorRepository;
     private final ConsumableRepository consumableRepository;
     private final Sorting sort;
 
-    public InventoryRepository(WeaponRepository weaponRepository, ArmorRepository armorRepository, ConsumableRepository consumableRepository, Sorting sort) {
+    public InventoryRepository(DatabaseConfig config, WeaponRepository weaponRepository, ArmorRepository armorRepository, ConsumableRepository consumableRepository, Sorting sort) {
+        this.config = config;
         this.weaponRepository = weaponRepository;
         this.armorRepository = armorRepository;
         this.consumableRepository = consumableRepository;
@@ -79,6 +86,21 @@ public class InventoryRepository {
         List<Armor> armors = findAllArmor();
         sort.sortByArmor(armors);
         return armors;
+    }
+
+    public boolean deleteItemById(int id) {
+        String sql = "DELETE FROM item WHERE id = ?";
+
+        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            int rows = stmt.executeUpdate();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("An error occurred while deleting item.", e);
+        }
     }
 }
 

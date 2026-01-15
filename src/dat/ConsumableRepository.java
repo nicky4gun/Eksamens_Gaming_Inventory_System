@@ -16,6 +16,25 @@ public class ConsumableRepository {
         this.config = config;
     }
 
+    public boolean stackConsumable(String name, int quantity) {
+        if (!name.equals("ARROWS") && !name.equals("BOLTS")) return false;
+
+        String sql = "UPDATE consumable SET quantity = quantity + ? WHERE name = ? AND stack = true";
+
+        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setInt(1, quantity);
+            stmt.setString(2, name);
+
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to stack consumable", e);
+        }
+    }
+
     // CRUD operations for consumables
     public void addItem(Consumable consumable) {
         String sql = "INSERT INTO consumable (name, weight, category, health, damage, consumableType, stack, quantity) VALUES (?, ?, ?, ?, ?, ?,? , ?)";
@@ -88,20 +107,5 @@ public class ConsumableRepository {
         }
 
         return consumables;
-    }
-
-    public boolean deleteItemById(int id) {
-        String sql = "DELETE FROM item WHERE id = ?";
-
-        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, id );
-            int rows = stmt.executeUpdate();
-
-            return rows > 0;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while deleting item.", e);
-        }
     }
 }

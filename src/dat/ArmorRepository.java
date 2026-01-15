@@ -80,18 +80,5 @@ public class ArmorRepository {
         return armors;
     }
 
-    public boolean deleteItemById(int id) {
-        String sql = "DELETE FROM item WHERE id = ?";
 
-        try (Connection conn = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPassword())) {
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, id);
-            int rows = stmt.executeUpdate();
-
-            return rows > 0;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("An error occurred while deleting item.", e);
-        }
-    }
 }

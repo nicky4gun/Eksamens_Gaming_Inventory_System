@@ -3,9 +3,11 @@ package cli;
 import dat.*;
 import dat.config.DatabaseConfig;
 import logic.InventoryService;
+import logic.ItemFactory;
 import logic.Sorting;
 import models.*;
 import models.enums.*;
+import models.exceptions.InventoryFullException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,9 +25,10 @@ public class InventoryCliSystem {
         ArmorRepository armorRepository = new ArmorRepository(config);
         ConsumableRepository consumableRepository = new ConsumableRepository(config);
         Sorting sort = new Sorting();
-        InventoryRepository inventoryRepository = new InventoryRepository(weaponRepository, armorRepository, consumableRepository, sort);
+        InventoryRepository inventoryRepository = new InventoryRepository(config, weaponRepository, armorRepository, consumableRepository, sort);
+        ItemFactory itemFactory = new ItemFactory();
 
-        InventoryService service = new InventoryService(playerRepository, weaponRepository, armorRepository, consumableRepository, inventoryRepository);
+        InventoryService service = new InventoryService(playerRepository, weaponRepository, armorRepository, consumableRepository, inventoryRepository, itemFactory);
 
         Scanner scanner = new Scanner(System.in);
 
@@ -190,7 +193,6 @@ public class InventoryCliSystem {
                 int id = scanner.nextInt();
                 scanner.nextLine();
 
-
                 if (id < 0) {
                     System.out.println("Not a valid id. Try again!");
                 } else if (id == 0) {
@@ -213,7 +215,6 @@ public class InventoryCliSystem {
     }
 
     private static void handleCollectLoot(InventoryService service) {
-        System.out.print("Choose number of items to pick up: ");
         Random random = new Random();
         int numberOfItems = random.nextInt(5);
         System.out.println("You found " +  numberOfItems + " items to pick up!");
@@ -228,7 +229,7 @@ public class InventoryCliSystem {
             try {
                 service.addItem(randomItem);
                 successfullyAdded++;
-            } catch (Exception e) {
+            } catch (InventoryFullException e) {
                 System.out.println(e.getMessage());
                 break;
             }

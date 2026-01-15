@@ -3,6 +3,7 @@ package logic;
 import dat.*;
 import models.*;
 import models.enums.*;
+import models.exceptions.InventoryFullException;
 
 import java.util.List;
 import java.util.Random;
@@ -13,34 +14,38 @@ public class InventoryService {
     private final ArmorRepository armorRepository;
     private final ConsumableRepository consumableRepository;
     private final InventoryRepository inventoryRepository;
+    private final ItemFactory itemFactory;
 
-    private final int MAX_WEIGHT = 50;
+    private final double MAX_WEIGHT = 50.0;
     private final int MAX_SLOTS =192;
     private final int SLOT_COST = 30;
     private int gold = 0;
 
     private final Random rand = new Random();
 
-    public InventoryService(PlayerRepository playerRepository, WeaponRepository weaponRepository, ArmorRepository armorRepository, ConsumableRepository consumableRepository, InventoryRepository inventoryRepository) {
+    public InventoryService(PlayerRepository playerRepository, WeaponRepository weaponRepository, ArmorRepository armorRepository, ConsumableRepository consumableRepository, InventoryRepository inventoryRepository, ItemFactory itemFactory) {
         this.playerRepository = playerRepository;
         this.weaponRepository = weaponRepository;
         this.armorRepository = armorRepository;
         this.consumableRepository = consumableRepository;
         this.inventoryRepository = inventoryRepository;
+        this.itemFactory = itemFactory;
     }
 
     // Game logic
     private void checkWeight(Item item) {
         double totalWeight = getTotalWeightFromDb();
         if (totalWeight + item.getWeight() > MAX_WEIGHT) {
-            throw new IllegalStateException("Can't add item: inventory exceeds max weight of " + MAX_WEIGHT);
+            throw new InventoryFullException("Can't add item: inventory would exceed max weight of " + MAX_WEIGHT + " kg");
         }
     }
 
     private void checkSlotsAvailable() {
         int usedSlots = getUsedSlotsFromDb();
-        if (usedSlots + 1 > getSlotsAvailable()) {
-            throw new IllegalStateException("Can't add item: no free slots available");
+        int availableSlots = playerRepository.getSlots();
+
+        if (usedSlots >= availableSlots) {
+            throw new InventoryFullException("Can't add item: no free slots available");
         }
     }
 
@@ -79,6 +84,7 @@ public class InventoryService {
 
     // Create objects
     public void addItem(Item item) {
+        if (tryStacking(item)) return;
         checkWeight(item);
         checkSlotsAvailable();
 
@@ -90,14 +96,51 @@ public class InventoryService {
         }
     }
 
+    public boolean tryStacking(Item item) {
+        if (!(item instanceof  Consumable consumable)) return false;
+
+        for (Consumable c : findAllConsumables()) {
+            if (c.getName().equals(consumable.getName()) && c.getStackable()) {
+                c.setQuantity(c.getQuantity() + consumable.getQuantity());
+
+                consumableRepository.stackConsumable(c.getName(), c.getQuantity());
+                System.out.println("Stacked " + consumable.getQuantity() + "x " + c.getName());
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Example on method-overloading
+    public void addItem(Weapon weapon) {
+        checkWeight(weapon);
+        checkSlotsAvailable();
+
+        weaponRepository.addItem(weapon);
+    }
+
+    public void addItem(Armor armor) {
+        checkWeight(armor);
+        checkSlotsAvailable();
+
+        armorRepository.addItem(armor);
+    }
+
+    public void addItem(Consumable consumable) {
+        checkWeight(consumable);
+        checkSlotsAvailable();
+
+        consumableRepository.addItem(consumable);
+    }
+
     public void deleteItemFromInventory(int id) {
         if (id <= 0) {
             throw new IllegalArgumentException("Invalid item id: " + id);
         }
 
-        boolean deleted = weaponRepository.deleteItemById(id) ||
-                armorRepository.deleteItemById(id) ||
-                consumableRepository.deleteItemById(id);
+        boolean deleted = inventoryRepository.deleteItemById(id);
 
         if (!deleted) {
             throw new IllegalArgumentException("Item with id " + id + " not found");
@@ -108,89 +151,18 @@ public class InventoryService {
         System.out.println("You gained " + gold + " gold!");
     }
 
-    // Item creation methods
+    // Item creation through factory
     public Item createRandomItem() {
-        int choice = 1 + rand.nextInt(3);
-
-        return switch (choice) {
-            case 1 -> createRandomWeapon();
-            case 2 -> createRandomArmor();
-            case 3 -> createRandomConsumable();
-            default -> throw new IllegalArgumentException("Unexpected random value: " + choice);
-        };
-    }
-
-    private Weapon createRandomWeapon() {
-        ItemCategory category = ItemCategory.WEAPON;
-        double weight = 0.5 + (5 * rand.nextDouble());
-        int damage = 5 + rand.nextInt(30);
-        double attackSpeed = 0.5 + rand.nextDouble() * 2;
-
-        WeaponHandling weaponHandling = WeaponHandling.values()[rand.nextInt(WeaponHandling.values().length)];
-        WeaponType weaponType = WeaponType.values()[rand.nextInt(WeaponType.values().length)];
-        CoolWeaponNames coolWeaponNames = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
-        CoolWeaponNames coolWeaponNames2 = CoolWeaponNames.values()[rand.nextInt(CoolWeaponNames.values().length)];
+        Item item = itemFactory.createRandomItem();
         addGold(rand.nextInt(20) + 1);
-
-        int nameGen = rand.nextInt(3) + 1;
-        String weaponName;
-
-        if (nameGen == 1) {
-            weaponName = weaponType + " " + coolWeaponNames;
-        } else if (nameGen == 2){
-            weaponName = coolWeaponNames + " " + weaponType;
-        } else {
-            weaponName = coolWeaponNames + " " + weaponType + " " + coolWeaponNames2;
-        }
-
-        return new Weapon(weaponName, weight, damage, attackSpeed, weaponHandling, category, weaponType);
-    }
-
-    private Armor createRandomArmor() {
-        ItemCategory category = ItemCategory.ARMOR;
-        double weight = 0.5 + (5 * rand.nextDouble());
-        ArmorCategory armorCategory = ArmorCategory.values()[rand.nextInt(ArmorCategory.values().length)];
-        CoolArmorNames coolArmorNames = CoolArmorNames.values()[rand.nextInt(CoolArmorNames.values().length)];
-        String armorName = armorCategory.name() + " " + coolArmorNames;
-
-        int defense = 1 + rand.nextInt(40);
-        addGold(rand.nextInt(20) + 1);
-
-        return new Armor(armorName, weight, category, defense);
-    }
-
-    private Consumable createRandomConsumable() {
-        ItemCategory category = ItemCategory.CONSUMABLE;
-
-        CoolConsumabelName coolConsumableName = CoolConsumabelName.values()[rand.nextInt(CoolConsumabelName.values().length)];
-        ConsumableCategory consumableCategory = ConsumableCategory.values()[rand.nextInt(ConsumableCategory.values().length)];
-        String consumableName = coolConsumableName.name();
-
-        double weight = 0.5;
-        int health = 0;
-        int damage = 0;
-        boolean stackable = false;
-        int quantity = 0;
-
-        addGold(rand.nextInt(20) + 1);
-
-        if (consumableCategory == ConsumableCategory.HEALTH_POTION) {
-            health = 50;
-        } else if (consumableCategory == ConsumableCategory.DAMAGE_POTION) {
-            damage = 20;
-        } else if (consumableCategory == ConsumableCategory.ARROWS || consumableCategory == ConsumableCategory.BOLTS ) {
-            stackable = true;
-            quantity = 12;
-        }
-
-        return new Consumable(consumableName, weight, category, health, damage, consumableCategory, stackable, quantity);
+        return item;
     }
 
     // Searching
     public List<Weapon> findAllWeapons() {
         List<Weapon> items = inventoryRepository.findAllWeapons();
 
-        if (items.isEmpty()) {
+        if (items == null || items.isEmpty()) {
             System.out.println("You don't have any weapons");
         }
 
@@ -200,7 +172,7 @@ public class InventoryService {
     public List<Armor> findAllArmor() {
         List<Armor> items = inventoryRepository.findAllArmor();
 
-        if (items.isEmpty()) {
+        if (items == null || items.isEmpty()) {
             System.out.println("You don't have any armor");
         }
 
@@ -210,7 +182,7 @@ public class InventoryService {
     public List<Consumable> findAllConsumables() {
         List<Consumable> items = inventoryRepository.findAllConsumables();
 
-        if (items.isEmpty()) {
+        if (items == null || items.isEmpty()) {
             System.out.println("You don't have any consumables");
         }
 
@@ -221,7 +193,7 @@ public class InventoryService {
     public List<Item> findAllItemsBySortedByName() {
         List<Item> items = inventoryRepository.findAllItemsSortedByName();
 
-        if (items.isEmpty()) {
+        if (items == null || items.isEmpty()) {
             System.out.println("Your Inventory is Empty!");
         }
 
@@ -231,7 +203,7 @@ public class InventoryService {
     public List<Item> findAllItemsBySortedById() {
         List<Item> items = inventoryRepository.findAllItemsSortedById();
 
-        if (items.isEmpty()) {
+        if (items == null || items.isEmpty()) {
             System.out.println("Your Inventory is Empty!");
         }
 
@@ -241,7 +213,7 @@ public class InventoryService {
     public List<Item> findAllItemsBySortedByWeight() {
         List<Item> items = inventoryRepository.findAllItemsSortedByWeight();
 
-        if (items.isEmpty()) {
+        if (items == null || items.isEmpty()) {
             System.out.println("Your Inventory is Empty!");
         }
 
@@ -251,7 +223,7 @@ public class InventoryService {
     public List<Item> findAllItemsBySortedByType() {
         List<Item> items = inventoryRepository.findAllItemsSortedByType();
 
-        if (items.isEmpty()) {
+        if (items == null || items.isEmpty()) {
             System.out.println("Your Inventory is Empty!");
         }
 
@@ -261,7 +233,7 @@ public class InventoryService {
     public List<Weapon> findAllItemsBySortedByCategory() {
         List<Weapon> items = inventoryRepository.findAllWeaponsSortedCategory();
 
-        if (items.isEmpty()) {
+        if (items == null || items.isEmpty()) {
             System.out.println("You don't have any weapons. Unable to sort by category.");
         }
 
@@ -271,7 +243,7 @@ public class InventoryService {
     public List<Armor> findAllItemsBySortedByDefense(){
         List<Armor> items = inventoryRepository.findAllArmorSortedCategory();
 
-        if (items.isEmpty()) {
+        if (items == null || items.isEmpty()) {
             System.out.println("You don't have any armor. Unable to sort by defense.");
         }
 
